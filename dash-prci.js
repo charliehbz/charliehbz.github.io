@@ -177,7 +177,7 @@
     const m = state.metric, lab = { inr: { en: 'INR per order', zh: '未收到货投诉（每单）' }, snad: { en: 'SNAD per order', zh: '与描述不符投诉（每单）' }, loss: { en: 'Loss per GMV', zh: '损失（占成交额）' } }[m];
     const hide = (arr) => arr.map((v, i) => (i + 1 > MATURE ? null : v));
     Kit.lineChart($('p-cat-risk'), { x: WX, height: 230, left: 50, xstep: 9, xfmt: wkTick, zero: false, endLabels: false, yfmt: pct(1), tipfmt: pct(2), tipx: wkTip,
-      shade: [{ x0: MATURE + 0.5, x1: NW + 0.5, label: { en: 'Not mature', zh: '未成熟' } }],
+      shade: [{ x0: MATURE + 0.5, x1: NW + 0.5, label: $('p-cat-risk').clientWidth >= 640 ? { en: 'Not mature', zh: '未成熟' } : null }],   // too narrow a band for a label on smaller charts; the caption says it
       series: [{ key: 'hr', label: { en: 'High-risk sellers', zh: '高风险卖家' }, y: hide(s[m][0]), color: 'var(--hr)', width: 2 }, { key: 'o', label: { en: 'Other sellers', zh: '其他卖家' }, y: hide(s[m][1]), color: 'var(--nonhr)', width: 1.6 }],
       title: lab });
     $('p-risk-title').innerHTML = L(lab);
@@ -188,13 +188,16 @@
       zh: `${sel.zh}：基期周均 ${pct(1)(w(s.share, PRE))}，观察期周均 ${pct(1)(w(s.share, POST))}（这里是各周平均；贡献分解按成交额加权）。阴影是前后窗口。` });
   }
 
+  function ctvRows() {
+    const rows = D.all.slice().sort((a, b) => (a.isOther ? 1 : b.isOther ? -1 : b.delta - a.delta));
+    rows.push({ name: { en: 'Overall change', zh: '整体变化' }, rateD: D.totRate, mixD: D.totMix, delta: D.total, total: true });
+    return rows;
+  }
   function drawCtv() {
     $('p-ctv-eqs').innerHTML =
       `<p class="eq"><span class="k">${L({ en: 'High-risk share of Fashion GMV', zh: 'Fashion 高风险成交占比' })}</span><span class="v">${L({ en: 'before', zh: '基期' })} ${D.pre.toFixed(2)}% → ${L({ en: 'after', zh: '观察期' })} ${D.post.toFixed(2)}% = <b>${sgn(D.total, 2)} pp</b></span></p>`
       + `<p class="eq"><span class="k">${L({ en: 'Numerator and denominator', zh: '分子和分母' })}</span><span class="v">${L({ en: 'high-risk GMV', zh: '高风险成交额' })} <b>${sgn(D.hrChg, 1)}%</b> · ${L({ en: 'all Fashion GMV', zh: '全部成交额' })} <b>${sgn(D.gmvChg, 1)}%</b></span></p>`;
-    const rows = D.all.slice().sort((a, b) => (a.isOther ? 1 : b.isOther ? -1 : b.delta - a.delta));
-    rows.push({ name: { en: 'Overall change', zh: '整体变化' }, rateD: D.totRate, mixD: D.totMix, delta: D.total, total: true });
-    contribBars($('p-ctv-bars'), rows, { split: true, hl: state.hl === 'top' || state.hl === 'note' ? state.hl : null, title: { en: 'Contribution of each category to the change, pp', zh: '各品类对整体变化的贡献（pp）' } });
+    contribBars($('p-ctv-bars'), ctvRows(), { split: true, hl: state.hl === 'top' || state.hl === 'note' ? state.hl : null, title: { en: 'Contribution of each category to the change, pp', zh: '各品类对整体变化的贡献（pp）' } });
     const p1 = (v) => (v * 100).toFixed(1) + '%';
     Kit.table($('p-ctv-table'), {
       sortKey: 'delta', sortDir: 'desc',
@@ -216,8 +219,15 @@
   }
 
   function drawSeller() {
-    const v = SELLER[state.win], box = $('p-sel-chart');
-    const W = Math.max(box.clientWidth, 280), H = 250, m = { l: 40, r: 10, t: 18, b: 30 };
+    const v = SELLER[state.win];
+    sellerChart($('p-sel-chart'), v, 250);
+    const top10 = v[0], mid = v[3], big = v.indexOf(Math.max(...v));
+    $('p-sel-eqs').innerHTML =
+      `<p class="eq"><span class="k">${L({ en: 'Top 10 sellers', zh: '前 10 名卖家' })}</span><span class="v"><b>${top10.toFixed(1)}%</b> ${L({ en: 'of high-risk GMV', zh: '的高风险成交额' })}</span></p>`
+      + `<p class="eq"><span class="k">${L({ en: 'Sellers ranked 101–500', zh: '排名 101–500 的卖家' })}</span><span class="v"><b>${mid.toFixed(1)}%</b>${L(big === 3 ? { en: ' — the largest group', zh: '，是最大的一组' } : { en: '', zh: '' })}</span></p>`;
+  }
+  function sellerChart(box, v, H) {
+    const W = Math.max(box.clientWidth, 280), m = { l: 40, r: 10, t: 18, b: 30 };
     const pw = W - m.l - m.r, ph = H - m.t - m.b, bw = pw / v.length, sy = (p) => m.t + (1 - p / 100) * ph;
     let g = `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="${esc(t({ en: 'Share of high-risk GMV by seller-rank bucket, with the cumulative share', zh: '按卖家排名分组的高风险成交额占比，及累计占比' }))}">`;
     for (const p of [0, 25, 50, 75, 100]) g += `<line class="gridline" x1="${m.l}" x2="${W - m.r}" y1="${sy(p)}" y2="${sy(p)}"/><text x="${m.l - 8}" y="${sy(p) + 4}" text-anchor="end">${p}%</text>`;
@@ -234,10 +244,6 @@
     acc = 0;
     v.forEach((p, i) => { acc = r1(acc + p); const cx = m.l + (i + 0.5) * bw; g += `<circle cx="${cx.toFixed(1)}" cy="${sy(acc).toFixed(1)}" r="3.5" style="fill:var(--ink);stroke:var(--paper);stroke-width:1.5px"/>`; if (i > 0) g += `<text x="${(cx + 6).toFixed(1)}" y="${(sy(acc) - 7).toFixed(1)}" style="fill:var(--ink)">${acc.toFixed(1)}%</text>`; });
     box.innerHTML = g + '</svg>';
-    const top10 = v[0], mid = v[3], big = v.indexOf(Math.max(...v));
-    $('p-sel-eqs').innerHTML =
-      `<p class="eq"><span class="k">${L({ en: 'Top 10 sellers', zh: '前 10 名卖家' })}</span><span class="v"><b>${top10.toFixed(1)}%</b> ${L({ en: 'of high-risk GMV', zh: '的高风险成交额' })}</span></p>`
-      + `<p class="eq"><span class="k">${L({ en: 'Sellers ranked 101–500', zh: '排名 101–500 的卖家' })}</span><span class="v"><b>${mid.toFixed(1)}%</b>${L(big === 3 ? { en: ' — the largest group', zh: '，是最大的一组' } : { en: '', zh: '' })}</span></p>`;
   }
 
   function drawSeg() {
@@ -315,5 +321,8 @@
       return $(c.block);
     },
     clear() { state.hl = null; unmark(); redrawAll(true); },
+    // the same charts, drawn into the review's evidence panel
+    drawContrib(box, hl) { contribBars(box, ctvRows(), { split: true, hl, rowH: 22, labW: 120, title: { en: 'Contribution of each category to the change, pp', zh: '各品类对整体变化的贡献（pp）' } }); },
+    drawSeller(box) { sellerChart(box, SELLER.post, 190); },
   });
 })();

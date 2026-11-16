@@ -101,7 +101,7 @@
           + (it.kind ? `<span class="bo-kind">${L(KIND[it.kind] || B(it.kind, it.kind))}</span> ` : '')
           + `<span class="bo-t">${esc(it.text)}</span>`
           + (it.when ? ` <span class="bo-when">${L(B('When:', '时间：'))} ${esc(it.when)}</span>` : '')
-          + (c ? ` <button type="button" class="to-chart" data-chart="${esc(it.chart)}">${L(B('See chart: ', '看图：'))}${L(c.label)} →</button>` : '')
+          + (c ? ` <button type="button" class="to-chart" data-chart="${esc(it.chart)}">${L(B('See chart: ', '看图：'))}${L(c.label)}</button>` : '')
           + '</li>';
       }
       h += '</ul></div>';
@@ -131,7 +131,7 @@
     if (!stale) { box.innerHTML = ''; return; }
     const now = st.win === 'all' ? E.scopeName(st.opt, 'all') : scopeOf(st.opt, st.win);
     box.innerHTML = `<div class="bo-stale"><p>${L(B(`The filter is now ${now.en}. This brief still describes ${scopeOf(brief.opt, brief.win).en}.`, `筛选已改为 ${now.zh}；这份简报仍对应 ${scopeOf(brief.opt, brief.win).zh}。`))}</p>`
-      + `<p>${st.win !== 'all' ? `<button type="button" class="brief-go small" data-act="redraft">${L(B('Draft for the new scope', '为新范围生成'))}</button> ` : ''}<button type="button" class="ghost" data-act="restore">${L(B("Go back to the brief's scope", '切回简报的范围'))}</button></p></div>`;
+      + `<p>${st.win !== 'all' ? `<button type="button" class="btn" data-act="redraft">${L(B('Draft for the new scope', '为新范围生成'))}</button> ` : ''}<button type="button" class="ghost" data-act="restore">${L(B("Go back to the brief's scope", '切回简报的范围'))}</button></p></div>`;
   }
 
   // ------------------------------------------------------------------------------------------- back to the charts
@@ -147,7 +147,7 @@
     if (!back) {
       back = document.createElement('button');
       back.type = 'button'; back.className = 'back-brief ghost';
-      back.innerHTML = L(B('← Back to the brief', '← 回到简报'));
+      back.innerHTML = L(B('Back to the brief', '回到简报'));
       back.addEventListener('click', () => { back.remove(); E.focus([]); $('brief-out').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
       el.prepend(back);
     }

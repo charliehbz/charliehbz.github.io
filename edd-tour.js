@@ -109,11 +109,11 @@
       if (choice) {
         h += `<div class="tour-reveal"><p class="tr-v${choice === 'watch' ? ' ok' : ''}">${L(S.verdict[choice])} ${L(S.why[choice])}</p>`
           + `<p class="tb-k">${L(B('Basis, from the charts above', '依据（来自上面的图）'))}</p><ol>${S.basis.map((x) => `<li>${L(x)}</li>`).join('')}</ol>`
-          + `<p>${L(S.next)}</p><p class="note">${L(S.contrast)} ${btn('economy', B('See Economy →', '看 Economy →'))}</p>`
-          + `<p class="tour-end">${btn('brief', B('Draft this as a brief with AI ↓', '用 AI 把它起草成简报 ↓'), 'tour-go small')} ${btn('exit', B('Exit and browse freely', '退出演示，自由浏览'))}</p></div>`;
+          + `<p>${L(S.next)}</p><p class="note">${L(S.contrast)} ${btn('economy', B('See the Economy contrast', '看 Economy 的对照'))}</p>`
+          + `<p class="tour-end">${btn('brief', B('Draft this as a brief with AI', '用 AI 把它起草成简报'), 'btn')} ${btn('exit', B('Exit and browse freely', '退出演示，自由浏览'))}</p></div>`;
       }
     }
-    h += `<div class="tour-nav">${step > 0 ? btn('prev', B('← Back', '← 上一步')) : '<span></span>'}<span class="tour-dots" aria-hidden="true">${[0, 1, 2].map((i) => `<i class="${i === step ? 'on' : ''}"></i>`).join('')}</span>${step < 2 ? btn('next', B('Next →', '下一步 →'), 'tour-go small') : '<span></span>'}</div>`;
+    h += `<div class="tour-nav">${step > 0 ? btn('prev', B('Back', '上一步')) : '<span></span>'}<span class="tour-dots" aria-hidden="true">${[0, 1, 2].map((i) => `<i class="${i === step ? 'on' : ''}"></i>`).join('')}</span>${step < 2 ? btn('next', B('Next step', '下一步'), 'btn') : '<span></span>'}</div>`;
     card.innerHTML = h;
     // put the card next to the chart this step is about, and outline those charts
     const at = document.getElementById(S.at);
@@ -124,6 +124,7 @@
   function go(i, quiet) { step = i; render(); if (!quiet) card.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
   function start(quiet) {
     choice = null; drift = false;
+    if (window.SiteNav) SiteNav.show('edd');   // the entry also sits on the EDD card, above both projects
     E.showTab('ship');
     E.set(SC, 'tour');
     go(0, quiet);

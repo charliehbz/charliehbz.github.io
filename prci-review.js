@@ -114,10 +114,10 @@
       if (s.supported) h += `<p class="rv-sup">${L(s.supported)}</p>`;
       h += `<p class="tb-k">${L(s.answer === 'rewrite' ? B('Two misreadings in the original', '原句的两处误读') : B('Basis', '判断依据'))}</p><ul class="tour-list">${s.why.map((x) => `<li>${L(x)}</li>`).join('')}</ul>`;
       if (s.need) h += `<div class="missing"><p class="tb-k">${L(B('Missing data, and the next step', '缺的数据和下一步'))}</p><p>${L(s.need)}</p></div>`;
-      h += `<p class="tour-end">${btn('evidence', B(`See the evidence: ${s.evLabel.en} →`, `查看证据：${s.evLabel.zh} →`), 'tour-go small')}</p></div>`;
+      h += `<p class="rv-evhint"><span class="w">${L(B('The evidence is open on the right.', '证据已在右侧展开。'))}</span><span class="n">${L(B('The evidence is open just below.', '证据已在下方展开。'))}</span></p></div>`;
     }
-    h += `<div class="tour-nav">${cur > 0 ? btn('prev', B('← Previous', '← 上一句')) : '<span></span>'}<span class="tour-dots" aria-hidden="true">${[0, 1, 2].map((i) => `<i class="${i === cur ? 'on' : ''}"></i>`).join('')}</span>`
-      + (cur < 2 ? btn('next', B('Next sentence →', '下一句 →'), a ? 'tour-go small' : 'ghost') : done() === 3 ? btn('final', B('See the reviewed version ↓', '看审核后的版本 ↓'), 'tour-go small') : '<span></span>') + '</div>';
+    h += `<div class="tour-nav">${cur > 0 ? btn('prev', B('Previous', '上一句')) : '<span></span>'}<span class="tour-dots" aria-hidden="true">${[0, 1, 2].map((i) => `<i class="${i === cur ? 'on' : ''}"></i>`).join('')}</span>`
+      + (cur < 2 ? btn('next', B('Next sentence', '下一句'), a ? 'btn' : 'ghost') : done() === 3 ? btn('final', B('See the reviewed version', '看审核后的版本'), 'btn') : '<span></span>') + '</div>';
     card.innerHTML = h;
   }
   function renderFinal() {
@@ -126,10 +126,49 @@
     fin.innerHTML = `<p class="tb-k">${L(B('Version for the strategy team', '可发给策略团队的版本'))}</p>`
       + `<div class="rv-out">${FINAL.text.map((x, i) => `<p><span class="rv-tag">${i + 1} · ${L(tags[i])}</span> ${L(x)}</p>`).join('')}</div>`
       + `<p class="tb-k">${L(B('What the review changed', '审核改变了什么'))}</p><ol class="tour-list">${FINAL.changed.map((x) => `<li>${L(x)}</li>`).join('')}</ol>`
-      + `<p class="tour-end">${btn('restart', B('Review again', '重新审核'))} ${btn('accept', B('How I would accept this AI feature ↓', '我会怎样验收这个 AI 功能 ↓'))}</p>`;
+      + `<p class="tour-end">${btn('restart', B('Review again', '重新审核'))} ${btn('accept', B('How I would accept this AI feature', '我会怎样验收这个 AI 功能'))}</p>`;
     fin.hidden = false;
   }
-  const render = () => { renderDraft(); renderCard(); renderFinal(); };
+  // the evidence for the current sentence, drawn with the dashboard's own charts once a judgement is made
+  const evp = $('rv-ev');
+  const EVID = [
+    { title: B(`Contributions: ${n(f.top)} is the biggest push; other categories pull down`, `品类贡献分解：${z(f.top)}是最大的上行项，其他品类在往下拉`),
+      facts: [B(`${n(f.top)} ${f.d} pp (rate ${f.rate}, mix ${f.mix}); all other categories together ${f.rest}; overall ${f.total}.`, `${z(f.top)} ${f.d} 个百分点（Rate ${f.rate}，Mix ${f.mix}）；其余品类合计 ${f.rest}；整体 ${f.total}。`),
+        B(`Largest by volume is ${n(f.big)}: ${f.bigShare} of Fashion's high-risk GMV after, against ${f.topShare} for ${n(f.top)}.`, `体量最大的是${z(f.big)}：观察期占 Fashion 高风险成交额的 ${f.bigShare}，${z(f.top)}是 ${f.topShare}。`)],
+      draw: (box) => P.drawContrib(box, 'top') },
+    { title: B(`Within ${n(f.top)}: the share of its GMV from sellers tagged high-risk`, `${z(f.top)}品类内：当前被标为高风险的卖家占成交额的比例`),
+      facts: [B(`${n(f.top)}: ${f.rPre} → ${f.rPost}. Fashion overall: ${D.pre.toFixed(2)}% → ${D.post.toFixed(2)}%.`, `${z(f.top)}：${f.rPre} → ${f.rPost}；Fashion 整体：${D.pre.toFixed(2)}% → ${D.post.toFixed(2)}%。`),
+        B(`Denominator: ${n(f.top)}'s GMV. Measured in GMV, not in sellers.`, `分母：${z(f.top)}的成交额。按金额算，不按卖家数。`),
+        B('Risk tiers: the latest snapshot when the data was pulled, the same for both windows.', '风险标签：跑表时的最新快照，基期和观察期是同一份。')],
+      draw: (box) => Kit.dumbbell(box, { rows: [{ label: f.top, a: +(top.ratePre * 100).toFixed(1), b: +(top.ratePost * 100).toFixed(1), color: 'var(--hr)' }, { label: B('Fashion overall', 'Fashion 整体'), a: +D.pre.toFixed(1), b: +D.post.toFixed(1), color: 'var(--ink)' }],
+        aName: B('Before', '基期'), bName: B('After', '观察期'), fmt: (v) => v.toFixed(1) + '%', dfmt: (v) => v.toFixed(1) + ' pp', better: 'lower', domain: [0, 35],
+        title: B('High-risk share of GMV, before to after', '高风险成交占比：基期 → 观察期') }) },
+    { title: B('Seller concentration: the scope is all of Fashion', '卖家集中度：范围是整个 Fashion'),
+      facts: [B(`After the change, the top 10 sellers hold ${f.s10} of Fashion's high-risk GMV, sellers ranked 101–500 hold ${f.s500}.`, `观察期前 10 名卖家占 Fashion 高风险成交额的 ${f.s10}，排名 101–500 的卖家占 ${f.s500}。`)],
+      missing: B("Missing: Men's Shoes × seller rank, for both windows. The illustrative data has no such cross-cut, so no chart is drawn. It is what the next request should ask for, with the risk records of the sellers concerned.", '缺这张图：男鞋 × 卖家排名（基期和观察期）。示意数据没有这个交叉维度，所以不画。下一步要补的就是它，再加上相关卖家的风险记录。'),
+      draw: (box) => P.drawSeller(box) },
+  ];
+  function renderEvidence() {
+    if (!evp) return;
+    const e = EVID[cur], s = S[cur];
+    let h = `<p class="ev-k">${L(B(`Evidence for sentence ${cur + 1}`, `第 ${cur + 1} 句的证据`))}${cur === 2 ? ` <span class="scope-tag on">${L(B('Scope: all of Fashion', '范围：整个 Fashion'))}</span>` : ''}</p>`;
+    if (!ans[cur]) {
+      evp.innerHTML = h + `<div class="ev-wait"><p>${L(B('Make your call first; the evidence opens here.', '先做判断，证据会在这里展开。'))}</p><p class="note">${L(B('It comes from: ', '证据来自：'))}${L(s.evLabel)}</p></div>`;
+      return;
+    }
+    h += `<p class="ev-t">${L(e.title)}</p><div class="chart" id="rv-ev-chart"></div><ul class="ev-facts">${e.facts.map((x) => `<li>${L(x)}</li>`).join('')}</ul>`;
+    if (e.missing) h += `<div class="ev-missing"><p>${L(e.missing)}</p></div>`;
+    h += `<p class="ev-act"><button type="button" class="ghost" data-act="evidence">${L(B('Open it in the full dashboard', '在完整看板中查看'))}</button></p>`;
+    evp.innerHTML = h;
+    e.draw($('rv-ev-chart'));
+  }
+  const pick = $('pick-viz-prci');
+  function renderPick() {   // the home card shows the same draft, and each verdict once it is judged
+    if (!pick) return;
+    pick.innerHTML = `<ol class="pick-draft">${S.map((s, i) => `<li><span class="pd-t">${L(s.text)}</span> <span class="pd-s${ans[i] ? ' done' : ''}">${ans[i] ? ICON[s.answer] + ' ' + L(CH[s.answer]) : L(B('To review', '待审'))}</span></li>`).join('')}</ol>`
+      + `<p class="pick-cap">${L(B('A draft an AI assistant might write from the dashboard. Each sentence: keep, rewrite, or needs more data?', '一段 AI 助手可能根据看板写出的草稿。每一句：可保留、需改写，还是需补数据？'))}</p>`;
+  }
+  const render = () => { renderDraft(); renderCard(); renderEvidence(); renderPick(); renderFinal(); };
 
   // ------------------------------------------------------------------------------------------- evidence, and the way back
   function clearEvidence() { document.querySelectorAll('.ev-banner').forEach((b) => b.remove()); }
@@ -140,7 +179,7 @@
     clearEvidence();
     const bn = document.createElement('div');
     bn.className = 'ev-banner';
-    bn.innerHTML = `<p><b>${L(B(`Evidence for sentence ${i + 1}`, `第 ${i + 1} 句的证据`))}</b> · ${L(s.look)}</p><button type="button" class="ghost" data-back>${L(B(`← Back to sentence ${i + 1}`, `← 回到第 ${i + 1} 句`))}</button>`;
+    bn.innerHTML = `<p><b>${L(B(`Evidence for sentence ${i + 1}`, `第 ${i + 1} 句的证据`))}</b> · ${L(s.look)}</p><button type="button" class="ghost" data-back>${L(B(`Back to sentence ${i + 1}`, `回到第 ${i + 1} 句`))}</button>`;
     bn.querySelector('[data-back]').addEventListener('click', back);
     const at = s.ev === 'ctv-note' ? $('p-ctv-note') : blk;   // sentence 2: the note under the chart is the evidence
     if (at === blk) blk.prepend(bn); else at.before(bn);
@@ -162,6 +201,16 @@
     else if (a === 'restart') { ans.fill(null); cur = 0; clearEvidence(); P.clear(); render(); card.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
     else if (a === 'accept') { const d = $('rv-accept'); d.open = true; d.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
   });
-  document.querySelectorAll('[data-review-start]').forEach((x) => x.addEventListener('click', (ev) => { ev.preventDefault(); card.scrollIntoView({ block: 'start', behavior: 'smooth' }); }));
+  document.querySelectorAll('[data-review-start]').forEach((x) => x.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    if (window.SiteNav) SiteNav.show('prci');   // the entry also sits on the PRCI card, above both projects
+    requestAnimationFrame(() => $('rv').scrollIntoView({ block: 'start', behavior: 'smooth' }));
+  }));
+  if (evp) {   // redraw the evidence chart when the width or the language changes
+    let lw = 0;
+    const re = () => { const w = evp.offsetWidth; if (w && w !== lw) { lw = w; renderEvidence(); } };
+    if ('ResizeObserver' in window) new ResizeObserver(re).observe(evp);
+    Kit.onLang(renderEvidence);
+  }
   render();
 })();

@@ -11,8 +11,8 @@
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Noto+Serif+SC:wght@600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Noto+Serif+SC:wght@600;700&display=swap"></noscript>
 <link rel="stylesheet" href="kit.css">
 <link rel="stylesheet" href="site.css">
 <script>
@@ -50,11 +50,41 @@
   </div>
 </header>
 
-<!-- Project tabs: switch the whole project. The small pill tabs inside each case switch dashboard pages. -->
+<!-- First screen: the two projects side by side (stacked on a phone). Each card is the project switch (data-proj) and
+     carries its hands-on entry; the small figure in it is drawn from the same illustrative data as the case. -->
+<section class="pick-wrap" aria-label="Projects">
+  <div class="wrap">
+    <p class="pick-intro"><span lang="en">Two projects from my eBay internship. Each leaves you one two-minute decision to make yourself, on illustrative data.</span><span lang="zh">两个 eBay 实习项目。每个都留了一个两分钟的判断，你可以用示意数据亲手做一遍。</span></p>
+    <div class="pick-grid">
+      <article class="pick" data-pick="edd">
+        <a class="pick-tab" href="#edd" data-proj="edd" aria-current="page"><span class="pick-k">EDD</span><span class="pick-n"><span lang="en">Delivery-date model rollout monitoring</span><span lang="zh">物流模型上线监控</span></span><span class="pick-cur"><span lang="en">Open below</span><span lang="zh">正在浏览</span></span></a>
+        <p class="pick-what"><span lang="en">How I turned a phased model rollout into metrics a team can track: coverage, adoption, promised days, on-time delivery and complaints. With an AI weekly-brief prototype.</span><span lang="zh">把一个预计送达时间模型的分阶段上线，拆成团队能追踪的几层指标：覆盖、采用、承诺天数、准时送达和投诉；另附一个 AI 周报原型。</span></p>
+        <div class="pick-viz" id="pick-viz-edd"></div>
+        <div class="pick-go" id="demo">
+          <a class="btn" href="#dashboard-shipping" data-tour-start><span lang="en">Decide whether a route should get a wider rollout</span><span lang="zh">判断一条线路是否值得扩大上线</span></a>
+          <span class="pick-time"><span lang="en">About 2 minutes, 3 steps</span><span lang="zh">约 2 分钟，3 步</span></span>
+        </div>
+        <p class="pick-note"><span lang="en">The dashboard is rebuilt from the one I delivered; the data is illustrative.</span><span lang="zh">看板按实习交付的版本重制，数据为示意。</span></p>
+      </article>
+      <article class="pick" data-pick="prci">
+        <a class="pick-tab" href="#prci" data-proj="prci"><span class="pick-k">PRCI</span><span class="pick-n"><span lang="en">Trust-risk attribution</span><span lang="zh">交易风险归因</span></span><span class="pick-cur"><span lang="en">Open below</span><span lang="zh">正在浏览</span></span></a>
+        <p class="pick-what"><span lang="en">How I traced a rise in Fashion's high-risk share of sales to the categories behind it. With a review flow for an AI-written risk recommendation.</span><span lang="zh">把 Fashion 高风险成交占比的一次上升，用贡献分解落到具体品类；另附一个审核 AI 风控建议的流程。</span></p>
+        <div class="pick-viz" id="pick-viz-prci"></div>
+        <div class="pick-go" id="review-cta">
+          <a class="btn" href="#review" data-review-start><span lang="en">Review an AI risk recommendation</span><span lang="zh">审核一条 AI 风控建议</span></a>
+          <span class="pick-time"><span lang="en">About 2 minutes, 3 sentences</span><span lang="zh">约 2 分钟，3 句</span></span>
+        </div>
+        <p class="pick-note"><span lang="en">AI recommendation review demo. The draft is a hand-built test case; the charts use illustrative data.</span><span lang="zh">AI 建议审核演示。草稿为人工构造的测试样例，图表使用示意数据。</span></p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- The compact project bar: shown once the cards above have scrolled away (site.js), so switching stays one tap away. -->
 <nav class="proj-nav" aria-label="Projects">
   <div class="wrap">
-    <a class="proj-tab" href="#edd" data-proj="edd" aria-current="page"><span class="pt-k">EDD</span><span class="pt-dot" aria-hidden="true">·</span><span class="pt-n"><span lang="en">Delivery-date model rollout monitoring</span><span lang="zh">物流模型上线监控</span></span></a>
-    <a class="proj-tab" href="#prci" data-proj="prci"><span class="pt-k">PRCI</span><span class="pt-dot" aria-hidden="true">·</span><span class="pt-n"><span lang="en">Trust-risk attribution</span><span lang="zh">交易风险归因</span></span></a>
+    <a class="proj-tab" href="#edd" data-proj="edd" aria-current="page"><span class="pt-k">EDD</span><span class="pt-n"><span lang="en">Delivery-date model rollout monitoring</span><span lang="zh">物流模型上线监控</span></span></a>
+    <a class="proj-tab" href="#prci" data-proj="prci"><span class="pt-k">PRCI</span><span class="pt-n"><span lang="en">Trust-risk attribution</span><span lang="zh">交易风险归因</span></span></a>
   </div>
 </nav>
 
@@ -63,13 +93,9 @@
   <!-- ======================================================================== 项目一：EDD（到「项目一结束」为止） -->
   <section class="project" id="project-edd" data-project="edd" data-title-en="EDD · Delivery-date model rollout monitoring · Haoyue Zhang" data-title-zh="EDD · 物流模型上线监控 · Haoyue Zhang 求职作品集">
     <div class="masthead">
-      <p class="eyebrow"><span lang="en">eBay · Cross-border shipping · Internship project</span><span lang="zh">eBay · 跨境物流 · 实习项目</span></p>
-      <h1><span lang="en">eBay cross-border shipping: shorter delivery promises, but can they be kept?</span><span lang="zh">eBay 跨境物流｜更短的预计送达时间，能否兑现？</span></h1>
+      <p class="eyebrow"><span lang="en">eBay internship project, cross-border shipping</span><span lang="zh">eBay 实习项目：跨境物流</span></p>
+      <h1><span lang="en">eBay cross-border shipping: shorter delivery promises, but can they be kept?</span><span lang="zh"><span class="ph">eBay 跨境物流｜</span><span class="ph">更短的预计送达时间，</span><span class="ph">能否兑现？</span></span></h1>
       <p class="lede"><span lang="en">During my eBay internship I owned the monitoring of a delivery-date model's phased rollout: I set the metrics, prepared the data in SQL and built a dashboard the team uses on its own.</span><span lang="zh">在 eBay 实习时，我负责一个预计送达时间模型分阶段上线后的监控：定指标、用 SQL 准备数据、搭建团队自助看板。</span></p>
-      <div class="tour-cta" id="demo">
-        <a class="tour-go" href="#dashboard-shipping" data-tour-start><span lang="en">Decide with me: should this route get a wider rollout?</span><span lang="zh">跟我判断一次：这条线路值得扩大上线吗？</span><span class="arr" aria-hidden="true">→</span></a>
-        <p class="note"><span lang="en">About 2 minutes · 3 steps in the dashboard below · illustrative data. Or jump to the <a href="#ai-brief">AI rollout-brief prototype</a> (a portfolio extension).</span><span lang="zh">约 2 分钟 · 在下方看板里走 3 步 · 示意数据。也可以直接看 <a href="#ai-brief">AI 上线简报原型</a>（作品集扩展）。</span></p>
-      </div>
       <p class="lede-sm"><span lang="en">The estimated delivery date (EDD) is the delivery date a buyer sees when placing an order. For orders within the model's scope the system works out two dates, one from the old rules and one from the model; the model's date replaces the rule's only when it is shorter. Monitoring has to answer how often the model's date is really used, and whether the shorter promises are kept.</span><span lang="zh">预计送达时间（EDD）是买家下单时看到的预计送达时间。对模型使用范围内的订单，系统同时算出原规则和模型两个时间，模型给出的时间更短时才会替换。上线监控要回答：模型真正用上了多少，更短的承诺能不能兑现。</span></p>
     </div>
 
@@ -83,15 +109,15 @@
           <p class="dek"><span lang="en">Rebuilt from the dashboard I delivered during the internship; the data shown is illustrative.</span><span lang="zh">根据实习期间实际交付的看板重制，展示数据为示意。</span></p>
         </div>
         <a class="brief-entry" href="#ai-brief">
-          <span class="be-t"><span lang="en">Draft this week's rollout brief with AI ↓</span><span lang="zh">用 AI 起草本周上线简报 ↓</span></span>
-          <span class="be-s"><span lang="en">Personal portfolio extension · illustrative data</span><span lang="zh">个人作品集扩展 · 使用示意数据</span></span>
+          <span class="be-t"><span lang="en">Draft this week's rollout brief with AI</span><span lang="zh">用 AI 起草本周上线简报</span></span>
+          <span class="be-s"><span lang="en">Personal portfolio extension, illustrative data</span><span lang="zh">个人作品集扩展，使用示意数据</span></span>
         </a>
       </div>
 
       <div class="dash" data-dash data-edd-dash>
         <div class="case-tabs" role="tablist" aria-label="Dashboard tabs">
-          <button type="button" role="tab" id="dashboard-gmv" aria-controls="dpanel-gmv" aria-selected="true"><span lang="en">GMV Performance</span><span lang="zh">GMV Performance · 商业表现</span></button>
-          <button type="button" role="tab" id="dashboard-shipping" aria-controls="dpanel-shipping" aria-selected="false" tabindex="-1"><span lang="en">Shipping Performance</span><span lang="zh">Shipping Performance · 物流表现</span></button>
+          <button type="button" role="tab" id="dashboard-gmv" aria-controls="dpanel-gmv" aria-selected="true"><span lang="en">GMV Performance</span><span lang="zh">GMV Performance 商业表现</span></button>
+          <button type="button" role="tab" id="dashboard-shipping" aria-controls="dpanel-shipping" aria-selected="false" tabindex="-1"><span lang="en">Shipping Performance</span><span lang="zh">Shipping Performance 物流表现</span></button>
         </div>
         <noscript><p class="note">The charts need JavaScript. 看板图表需要启用 JavaScript。</p></noscript>
 
@@ -262,7 +288,7 @@
               <button type="button" data-v="w22" aria-pressed="false"><span lang="en">W22–W25 · latest</span><span lang="zh">W22–W25 · 最近 4 周</span></button>
             </div>
           </div>
-          <button type="button" class="brief-go" id="brief-go"><span lang="en">Draft the brief</span><span lang="zh">生成简报</span></button>
+          <button type="button" class="btn brief-go" id="brief-go"><span lang="en">Draft the brief</span><span lang="zh">生成简报</span></button>
         </div>
         <p class="note" id="brief-scope"></p>
         <p class="brief-mode" id="brief-mode"></p>
@@ -391,13 +417,9 @@
   <!-- ======================================================================== 项目二：PRCI（到「项目二结束」为止） -->
   <section class="project" id="project-prci" data-project="prci" data-title-en="PRCI · Trust-risk attribution · Haoyue Zhang" data-title-zh="PRCI · 交易风险归因 · Haoyue Zhang 求职作品集">
     <div class="masthead">
-      <p class="eyebrow"><span lang="en">eBay · Trust and risk · Internship project</span><span lang="zh">eBay · 交易风险 · 实习项目</span></p>
-      <h1><span lang="en">eBay trust and risk: the high-risk share of Fashion sales rose. What pushed it up?</span><span lang="zh">eBay 交易风险｜高风险成交占比上升，是谁推高的？</span></h1>
+      <p class="eyebrow"><span lang="en">eBay internship project, trust and risk</span><span lang="zh">eBay 实习项目：交易风险</span></p>
+      <h1><span lang="en">eBay trust and risk: the high-risk share of Fashion sales rose. What pushed it up?</span><span lang="zh"><span class="ph">eBay 交易风险｜</span><span class="ph">高风险成交占比上升，</span><span class="ph">是谁推高的？</span></span></h1>
       <p class="lede"><span lang="en">During my eBay internship, Fashion's high-risk share of sales turned up again at the end of June 2026. I built the data from transaction detail, used a shift-share decomposition to assign the change to each category, and delivered a five-page dashboard; risk strategy and actions belong to the team.</span><span lang="zh">在 eBay 实习时，Fashion 的高风险成交占比在 2026 年 6 月底再次上行。我从交易明细搭数据，用 Shift-Share 把变化分到每个品类，并交付了五页看板；风险策略和具体处置由团队负责。</span></p>
-      <div class="tour-cta" id="review-cta">
-        <a class="tour-go" href="#review" data-review-start><span lang="en">Can this risk recommendation go to the strategy team?</span><span lang="zh">这条风控建议，可以发给策略团队吗？</span><span class="arr" aria-hidden="true">→</span></a>
-        <p class="note"><span lang="en"><b>AI recommendation review demo</b> · the draft is a hand-built test case; the charts use illustrative data. About 2 minutes, three sentences.</span><span lang="zh"><b>AI 建议审核演示</b> · 草稿为人工构造的测试样例，图表使用示意数据。约 2 分钟，逐句审 3 句。</span></p>
-      </div>
       <p class="lede-sm"><span lang="en">The high-risk share (High Risk GMV Mix) is the part of Fashion's sales (GMV) that comes from high-risk sellers. A seller's risk tier comes from the team's PRCI tiering (high, medium, low), taken from the latest snapshot when the data was pulled.</span><span lang="zh">高风险成交占比（High Risk GMV Mix）是 Fashion 总成交额（GMV）中来自高风险卖家的比例。卖家的风险等级来自团队的 PRCI 分层（高、中、低三档），取跑表时的最新快照。</span></p>
     </div>
 
@@ -413,9 +435,13 @@
         <div><dt><span lang="en">Delivered during the internship</span><span lang="zh">实习期间实际交付</span></dt><dd><span lang="en">The data analysis, the contribution decomposition and the five-page dashboard. Risk strategy and actions belong to the team.</span><span lang="zh">数据分析、贡献分解和五页看板。风险策略和具体处置由团队负责。</span></dd></div>
         <div><dt><span lang="en">Designed afterwards for this portfolio</span><span lang="zh">实习结束后为作品集设计</span></dt><dd><span lang="en">This review experience. The draft is a test case I wrote by hand, not model output and not a real team recommendation; the judgements and reasons are preset, and the charts use illustrative data.</span><span lang="zh">这个审核体验。草稿是我人工构造的测试样例，不是模型输出，也不是团队的真实建议；判断和依据是预设的，图表使用示意数据。</span></dd></div>
       </dl>
+      <!-- judgement and evidence side by side on a wide screen; on a phone the evidence follows the current sentence -->
       <div class="rv" id="rv">
-        <div class="rv-draft" id="rv-draft"></div>
-        <aside class="tour rv-card" id="rv-card" aria-live="polite"></aside>
+        <div class="rv-main">
+          <div class="rv-draft" id="rv-draft"></div>
+          <aside class="tour rv-card" id="rv-card" aria-live="polite"></aside>
+        </div>
+        <aside class="rv-ev" id="rv-ev" aria-live="polite" aria-label="Evidence"></aside>
         <div class="rv-final" id="rv-final" hidden></div>
       </div>
       <noscript><p class="note">The review needs JavaScript. 审核演示需要启用 JavaScript。</p></noscript>
@@ -542,7 +568,7 @@
         </div>
       </div>
       <p class="callout"><span lang="en">Evidence boundary: the project located and quantified the change; actions are still being decided, so there is no measured improvement. Risk tiers are the latest snapshot applied to all past weeks, so the analysis describes how today's high-risk sellers contributed over time, not the risk as labelled in each week. "Ever actioned" is a seller attribute and says nothing about whether actions worked.</span><span lang="zh">证据边界：项目完成的是定位和量化归因，治理措施还在推进，没有可验证的指标改善。风险等级用的是跑表时的最新快照，回填到所有历史周，描述的是「当前高风险卖家在历史上的贡献」，不是每周当时的风险暴露。「曾被处置」是卖家属性，不能说明处置有效或无效。</span></p>
-      <p class="note"><a href="#prci-dashboard"><span lang="en">See the dashboard ↓</span><span lang="zh">浏览看板 ↓</span></a></p>
+      <p class="note"><a href="#prci-dashboard"><span lang="en">See the dashboard</span><span lang="zh">浏览看板</span></a></p>
     </section>
 
     <!-- 5. The dashboard, rebuilt for the web: the five pages of the delivered one, drawn by ../dash-prci.js from illustrative data -->

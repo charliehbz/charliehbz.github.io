@@ -243,16 +243,43 @@
     };
   }
 
+  // ---------------------------------------------------------------------------------- the denominator figure
+  // Two bars on one scale: all orders (coverage), then only the eligible ones (adoption). The bracket between them shows
+  // the denominator shrinking. Built from the same rounded figures as everything else, so the text and bars agree.
+  function denomHtml(S, mini) {
+    const c = S.cur, b = S.base, g = S.basis === 'g', u = g ? 'k' : '';
+    const unit = g ? { en: 'sales', zh: '成交额' } : { en: 'orders', zh: '订单' };
+    const f = (x) => (x * 100).toFixed(2) + '%';
+    const seg = (cls, w) => `<i class="${cls}" style="width:${f(w)}"></i>`;
+    const fe = c.E / c.N, fa = c.A / c.E;
+    const k = (lab, val) => `<p class="den-k">${L(lab)} <b>${val.toFixed(1)}%</b></p>`;
+    // bar 1 (all), the bracket under its eligible part, bar 2 (eligible only): kept tight so the eye follows them down
+    let h = `<div class="den-row">${k({ en: 'Coverage', zh: '覆盖率' }, c.cov)}<div class="den-bar">${seg('a', c.A / c.N)}${seg('e', (c.E - c.A) / c.N)}${seg('u', 1 - fe)}</div></div>`
+      + `<div class="den-link" style="--f:${fe.toFixed(4)}"><span>${L({ en: `the denominator becomes the ${nf(c.E)}${u} eligible ${unit.en}`, zh: `分母变成符合条件的 ${nf(c.E)}${u}${g ? '' : ' 单'}` })}</span></div>`
+      + `<div class="den-row">${k({ en: 'Adoption', zh: '采用率' }, c.ad)}<div class="den-bar" style="width:${f(fe)}">${seg('a', fa)}${seg('e', 1 - fa)}</div></div>`;
+    if (!mini) {
+      h += `<p class="den-f">${L({ en: `Coverage = eligible ${nf(c.E)}${u} ÷ all ${unit.en} ${nf(c.N)}${u}. Adoption = used the model ${nf(c.A)}${u} ÷ eligible ${nf(c.E)}${u}.`,
+        zh: `覆盖率 = 符合条件 ${nf(c.E)}${u} ÷ 全部${unit.zh} ${nf(c.N)}${u}；采用率 = 实际采用 ${nf(c.A)}${u} ÷ 符合条件 ${nf(c.E)}${u}。` })}</p>`;
+      if (b) h += `<p class="den-pr">${L({ en: `Prior window: coverage ${b.cov.toFixed(1)}% (${sgn(r1(c.cov - b.cov), 1)} pp), adoption ${b.ad.toFixed(1)}% (${sgn(r1(c.ad - b.ad), 1)} pp).`, zh: `对比期：覆盖率 ${b.cov.toFixed(1)}%（${sgn(r1(c.cov - b.cov), 1)} pp），采用率 ${b.ad.toFixed(1)}%（${sgn(r1(c.ad - b.ad), 1)} pp）。` })}</p>`;
+    }
+    return `<div class="den${mini ? ' mini' : ''}">${h}</div>`;
+  }
+
   // ---------------------------------------------------------------------------------- shared state
   const state = { gmv: 'raw', opt: 'all', win: 'all', basis: 'n' };
   const listeners = [];
   const api = {
     OPTS: OPTS.map((o) => ({ k: o.k, name: o.name })), WINS: Object.keys(WINS), GROUPS, GLAB,
     ASOF: ASOF_TXT, IMM, inrDone: (w) => md(inrDone(w)), wl, wd, K,
-    summary, briefInput, optName, winName, scopeName, state,
+    summary, briefInput, optName, winName, scopeName, state, denomHtml,
     set() {}, on(fn) { listeners.push(fn); }, focus() {}, showTab() {},
   };
   window.EDD = api;
+  const card = document.getElementById('pick-viz-edd');
+  if (card) {   // the home card's small version: the demo's route (SpeedPAK, latest 4 weeks)
+    const S0 = summary('speedpak', 'w22', 'n');
+    card.innerHTML = denomHtml(S0, true) + `<p class="pick-cap">${L({ en: `SpeedPAK, latest 4 weeks: almost every order is covered, but only ${S0.cur.ad.toFixed(1)}% of eligible orders use the model's date.`, zh: `SpeedPAK 最近 4 周：几乎每单都在模型范围内，但只有 ${S0.cur.ad.toFixed(1)}% 的符合条件订单用上了模型时间。` })}</p>`;
+  }
 
   // ================================================================================== the page (skipped by brief/export.html)
   const root = document.querySelector('[data-edd-dash]');
@@ -348,13 +375,6 @@
     hit.addEventListener('pointerdown', show);
     hit.addEventListener('pointerleave', () => Kit.tipHide(box));
   }
-  function eqHtml(S) {
-    const k = S.basis === 'g', u = k ? 'k' : '', c = S.cur, b = S.base;
-    const prior = (v, d) => (b ? `<span class="pr">${L({ en: 'Prior', zh: '对比期' })} ${v.toFixed(1)}% · ${sgn(d, 1)} pp</span>` : '');
-    const eq = (lab, num, nl, den, dl, pct, pv) => `<p class="eq"><span class="k">${L(lab)}</span><span class="v">${L(nl)} <b>${nf(num)}${u}</b> ÷ ${L(dl)} ${nf(den)}${u} = <b>${pct.toFixed(1)}%</b></span>${pv}</p>`;
-    return eq({ en: 'Coverage', zh: '覆盖率' }, c.E, { en: 'eligible', zh: '符合条件' }, c.N, { en: 'all', zh: '全部' }, c.cov, b ? prior(b.cov, r1(c.cov - b.cov)) : '')
-      + eq({ en: 'Adoption among eligible', zh: '符合条件订单中的采用率' }, c.A, { en: 'used the model', zh: '实际采用' }, c.E, { en: 'eligible', zh: '符合条件' }, c.ad, b ? prior(b.ad, r1(c.ad - b.ad)) : '');
-  }
   function eddTable(el, P) {
     const mh = Math.max(...GROUPS.map((k) => P.hd[k])), mt = Math.max(...GROUPS.map((k) => P.td[k]));
     let h = `<span class="hd"></span><span class="hd">${L({ en: 'Handling', zh: '预计处理' })}</span><span class="hd">${L({ en: 'Transit', zh: '预计运输' })}</span><span class="hd tot">${L({ en: 'Delivery', zh: '整体送达' })}</span>`;
@@ -384,7 +404,7 @@
       : { en: 'weeks 1–25 (Jan 4–Jun 27)', zh: '第 1–25 周（1/4–6/27）' };
     $('ship-scope').innerHTML = L({ en: `${name.en}: ${span.en}; ${nf(Sn.cur.orders)} orders in the period (illustrative, data as of ${ASOF_TXT}). Every chart below follows these choices.`,
       zh: `${name.zh}：${span.zh}；期内共 ${nf(Sn.cur.orders)} 笔订单（示意，数据截至 ${ASOF_TXT}）。下面每张图都跟着这些选择变化。` });
-    $('ship-eqs').innerHTML = eqHtml(S);
+    $('ship-eqs').innerHTML = denomHtml(S);
     covChart($('ship-cov'), rows, state.basis);
     eddTable($('ship-edd'), Sn.cur);
     const opts = (extra) => Object.assign({ x: SX, height: 196, left: 48, xstep: 4, xfmt: wkTick, zero: false, endLabels: false, tipx: wkTip }, extra);
