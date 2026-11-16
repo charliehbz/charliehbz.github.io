@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="zh" data-lang="zh" data-default-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>eBay 跨境物流｜更短的预计送达时间，能否兑现？· 案例</title>
+<meta name="description" content="案例：为 eBay 大中华区跨境卖家的新预计送达时间模型设计上线监控指标，用 SQL 准备数据，搭建团队自助看板。">
+<meta property="og:title" content="eBay 跨境物流｜更短的预计送达时间，能否兑现？">
+<meta property="og:description" content="把模型覆盖率和实际采用率分开，再追踪承诺天数、准时送达和未收到货投诉。">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../site.css">
+<!--
+  案例页。公开版不写内部表名、字段名和业务绝对值；图用示意数据。
+  新案例：复制本文件，改文字；顶栏、面包屑、页脚照抄。每段可见文字都是 en / zh 一对。
+-->
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="who" href="../index.html"><span lang="en">Portfolio</span><span lang="zh">求职作品集</span></a>
+    <nav class="pages" aria-label="Pages">
+      <a href="../index.html"><span lang="en">Home</span><span lang="zh">首页</span></a>
+      <a href="../index.html#projects" aria-current="page"><span lang="en">Projects</span><span lang="zh">项目</span></a>
+    </nav>
+    <div class="toggles">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+        <button type="button" data-set-lang="zh" aria-pressed="true">中文</button>
+      </div>
+      <div class="seg" role="group" aria-label="Theme">
+        <button type="button" data-set-theme="light" aria-pressed="false"><span lang="en">Light</span><span lang="zh">浅色</span></button>
+        <button type="button" data-set-theme="dark" aria-pressed="false"><span lang="en">Dark</span><span lang="zh">深色</span></button>
+        <button type="button" data-set-theme="auto" aria-pressed="true"><span lang="en">Auto</span><span lang="zh">自动</span></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="../index.html"><span lang="en">Home</span><span lang="zh">首页</span></a><span aria-hidden="true">›</span>
+    <a href="../index.html#projects"><span lang="en">Projects</span><span lang="zh">项目</span></a><span aria-hidden="true">›</span>
+    <span aria-current="page"><span lang="en">eBay cross-border shipping</span><span lang="zh">eBay 跨境物流</span></span>
+  </nav>
+
+  <div class="masthead">
+    <p class="eyebrow"><span lang="en">eBay · Cross-border shipping · Internship project</span><span lang="zh">eBay · 跨境物流 · 实习项目</span></p>
+    <h1><span lang="en">eBay cross-border shipping: shorter delivery promises, but can they be kept?</span><span lang="zh">eBay 跨境物流｜更短的预计送达时间，能否兑现？</span></h1>
+    <p class="lede"><span lang="en">EDD (estimated delivery date) is the delivery date a buyer sees when placing an order. eBay's model team built a new model that uses past shipping data to predict delivery dates more accurately for orders from Greater China cross-border sellers, and rolled it out in phases. This case is about monitoring after launch: how many orders the model reached, how many actually used its date, and whether the shorter promises hurt on-time delivery or buyer complaints.</span><span lang="zh">预计送达时间（EDD）是买家下单时看到的预计送达时间。eBay 的模型团队开发了一个新模型，用历史物流数据为大中华区跨境卖家的订单预测更准确的送达时间，并分阶段上线。这个案例讲的是上线之后怎么监控：模型覆盖了多少订单、真正采用了多少，以及更短的承诺有没有影响准时送达和买家投诉。</span></p>
+  </div>
+
+  <!-- 1. My part, first -->
+  <section class="block" id="role">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">My part</span><span lang="zh">我的贡献</span></p>
+      <h2><span lang="en">I owned the rollout monitoring: the metrics, the data and the dashboard</span><span lang="zh">我负责上线监控：定指标、备数据、搭看板</span></h2>
+    </div>
+    <dl class="facts wide">
+      <dt><span lang="en">Metrics</span><span lang="zh">设计监控指标</span></dt>
+      <dd><span lang="en">Broke "how is the rollout going?" into layers: coverage, adoption, promised days, on-time delivery, complaints and share of sales. Fixed the denominator of each one.</span><span lang="zh">把"模型上线得怎么样"拆成覆盖、采用、承诺天数、准时送达、投诉和成交份额几层，并为每个指标定好分母。</span></dd>
+      <dt><span lang="en">Data in SQL</span><span lang="zh">用 SQL 准备数据</span></dt>
+      <dd><span lang="en">Starting from transaction-level shipping data, flagged whether each order was within the model's scope and whether it used the model's date, then aggregated by week and by seller region, route, shipping option and other dimensions, from 2024 on. Also flagged incomplete weeks and weeks whose delivery and complaint data had not yet reached 7, 14 or 30 days.</span><span lang="zh">从交易级的物流数据出发，标出每笔订单是否在模型的使用范围内、是否采用了模型的时间，再按周和卖家地区、线路、运输方式等维度汇总，覆盖 2024 年以来的数据。同时标出数据不满一整周的周，以及签收、投诉数据还没满 7、14、30 天观察期的周。</span></dd>
+      <dt><span lang="en">Dashboard</span><span lang="zh">搭建自助看板</span></dt>
+      <dd><span lang="en">Calculated the metrics in Python (pandas) and built a dashboard in Plotly and Streamlit that the team can filter and split on its own.</span><span lang="zh">用 Python（pandas）计算指标，用 Plotly 和 Streamlit 做成团队可以自己筛选、拆分的看板。</span></dd>
+      <dt><span lang="en">Not mine</span><span lang="zh">不由我负责</span></dt>
+      <dd><span lang="en">The model itself was built by the model team.</span><span lang="zh">模型本身由模型团队开发。</span></dd>
+    </dl>
+  </section>
+
+  <!-- 2. Context -->
+  <section class="block" id="context">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">Context</span><span lang="zh">背景</span></p>
+      <h2><span lang="en">The old rules promised long; the model's date is used only when it is shorter</span><span lang="zh">原规则的承诺偏长，模型给出的时间更短时才可能替换</span></h2>
+    </div>
+    <div class="prose">
+      <p><span lang="en">The platform used to set the delivery date with fixed rules. The rules were cautious, so buyers often saw long delivery promises, which can put them off buying. A promise that is too aggressive brings the opposite problem: parcels arrive late and buyers complain. The delivery date is a trade-off between conversion and fulfilment.</span><span lang="zh">过去平台按规则计算预计送达时间。规则偏保守，买家常看到较长的配送承诺，可能因此犹豫下单；可承诺如果过于激进、实际送不到，又会招来投诉。预计送达时间本身就是在转化和履约之间取舍。</span></p>
+      <p><span lang="en">The model covers orders that Greater China sellers ship from their home region, on the shipping options and destinations on the model's rollout list. For each such order the system works out two dates, one from the rules and one from the model. The model's date can replace the rule's only when it is shorter.</span><span lang="zh">模型的使用范围是大中华区卖家从本地发出、且运输方式和目的地在上线名单内的订单。对这些订单，系统会同时算出两个时间：一个来自原规则，一个来自模型。模型给出的时间更短时，才可能替换原规则的时间。</span></p>
+    </div>
+  </section>
+
+  <!-- 3. Coverage vs adoption: the core judgement, with the redrawn chart -->
+  <section class="block" id="coverage">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">Coverage and adoption</span><span lang="zh">覆盖与采用</span></p>
+      <h2><span lang="en">Eligible orders do not all end up with the model's date</span><span lang="zh">符合条件的订单，不一定都用上了模型的时间</span></h2>
+      <p class="dek"><span lang="en">The first two numbers the dashboard keeps apart. They have different denominators.</span><span lang="zh">这是看板里最先要分开的两个比例，它们的分母不同。</span></p>
+    </div>
+    <div class="split">
+      <div class="col">
+        <p><span lang="en">Picture a route where every order meets the model's conditions. Coverage on that route is 100%, yet only some of its orders may switch to the model's date. Each order compares two dates; where the rule's promise is already short, the model has nothing shorter to offer and the order keeps the rule's date.</span><span lang="zh">设想一条物流线路，上面的订单全部符合模型的使用条件，这条线路的覆盖率就是 100%。但真正改用模型时间的订单可能只有一部分：每笔订单都要比较两个时间，如果原规则的承诺本来就不长，模型给不出更短的时间，这笔订单就继续用原来的时间。</span></p>
+        <dl class="facts">
+          <dt><span lang="en">Coverage</span><span lang="zh">覆盖率</span></dt>
+          <dd><span lang="en">Orders that meet the model's conditions ÷ all orders. Answers "how many orders can the model handle?"</span><span lang="zh">符合模型使用条件的订单 ÷ 全部订单。回答"模型能处理多少订单"。</span></dd>
+          <dt><span lang="en">Adoption</span><span lang="zh">采用率</span></dt>
+          <dd><span lang="en">Orders that use the model's date ÷ eligible orders. Answers "of the orders it can handle, how many actually switched?"</span><span lang="zh">采用模型时间的订单 ÷ 符合条件的订单。回答"能处理的订单里，有多少真的换成了模型的时间"。</span></dd>
+        </dl>
+        <p><span lang="en">Both rates are worked out by order count and by sales value. Adoption uses only eligible orders as its denominator. With all orders underneath, adoption would rise whenever coverage grew, and you could not tell whether the model was used more or simply reached more orders.</span><span lang="zh">两个比例都按订单数和成交额各算一遍。采用率的分母只用符合条件的订单：如果用全部订单，覆盖范围一扩大，采用率也会跟着涨，就分不清是模型被用得更多了，还是只是覆盖变大了。</span></p>
+        <p><span lang="en">So a low adoption rate does not by itself mean the model failed. The dashboard shows the two rates side by side for each shipping option, so the team can tell "not covered" apart from "covered, but nothing shorter to switch to".</span><span lang="zh">所以采用率低，不一定说明模型没起作用。看板按运输方式把两个比例并排展示，团队可以分清是"没覆盖到"，还是"覆盖了，但没有更短的时间可换"。</span></p>
+      </div>
+
+      <figure class="rf" aria-labelledby="rf-cap">
+        <p class="rf-title"><span lang="en">Model coverage and adoption (illustration)</span><span lang="zh">模型覆盖与实际采用（示意）</span></p>
+        <div class="rf-row">
+          <p class="rf-head"><span class="rf-name"><span lang="en">Coverage</span><span lang="zh">覆盖率</span></span><span class="rf-eq">80/100 = 80%</span></p>
+          <div class="rf-bar">
+            <span class="rf-seg s-adopt" style="width:20%">20</span><span class="rf-seg s-elig" style="width:60%">60</span><span class="rf-seg s-out" style="width:20%">20</span>
+          </div>
+          <p class="rf-note"><span lang="en">Denominator: all 100 orders</span><span lang="zh">分母：全部 100 笔订单</span></p>
+        </div>
+        <div class="rf-row">
+          <p class="rf-head"><span class="rf-name"><span lang="en">Adoption among eligible orders</span><span lang="zh">符合条件订单中的采用率</span></span><span class="rf-eq">20/80 = 25%</span></p>
+          <div class="rf-bar" style="width:80%">
+            <span class="rf-seg s-adopt" style="width:25%">20</span><span class="rf-seg s-elig" style="width:75%">60</span>
+          </div>
+          <p class="rf-note"><span lang="en">Denominator: the 80 eligible orders</span><span lang="zh">分母：符合条件的 80 笔订单</span></p>
+        </div>
+        <ul class="rf-key">
+          <li><span class="sw s-adopt"></span><span lang="en">Used the model's date (20)</span><span lang="zh">采用了模型的时间（20）</span></li>
+          <li><span class="sw s-elig"></span><span lang="en">Eligible, kept the rule's date (60)</span><span lang="zh">符合条件，仍用原规则的时间（60）</span></li>
+          <li><span class="sw s-out"></span><span lang="en">Not eligible (20)</span><span lang="zh">不符合条件（20）</span></li>
+        </ul>
+        <figcaption class="caption" id="rf-cap"><span lang="en">Illustrative numbers, not eBay business data. Assume 100 orders: 80 meet the model's conditions and 20 end up using the model's delivery date. The second bar is shorter because its denominator is only the eligible orders.</span><span lang="zh">示意数据，非 eBay 实际业务数值。假设 100 笔订单，其中 80 笔符合模型使用条件，20 笔最终采用模型给出的预计送达时间。第二根条更短，因为它的分母只有符合条件的订单。</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 4. After adoption: promised days, on-time delivery, complaints -->
+  <section class="block" id="tracking">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">After adoption</span><span lang="zh">采用之后</span></p>
+      <h2><span lang="en">Once promises get shorter, check whether on-time delivery and complaints held up</span><span lang="zh">承诺缩短以后，还要看准时送达和投诉有没有变差</span></h2>
+      <p class="dek"><span lang="en">A shorter promise is not success on its own. The dashboard reads in this order: promised days, then actual delivery, then complaints.</span><span lang="zh">缩短承诺本身不算成功。看板按这个顺序排：先看承诺天数，再看实际履约，最后看投诉。</span></p>
+    </div>
+    <dl class="facts wide">
+      <dt><span lang="en">Promised days · main metric</span><span lang="zh">承诺天数 · 主指标</span></dt>
+      <dd><span lang="en">The end-to-end business days the buyer is promised, split into seller handling, transit and full delivery. Each is total days ÷ number of orders, so every order counts once and a few extreme orders in a small group do not skew it. The split shows which stage got shorter.</span><span lang="zh">买家看到的端到端预计送达工作日数，拆成卖家处理、物流运输、整体送达三段。每段都用"总天数 ÷ 订单数"计算，每笔订单权重相同，小群体里的个别极端值不会把平均拉偏。拆开以后，能看出缩短发生在哪一段。</span></dd>
+      <dt><span lang="en">On-time delivery · guardrail</span><span lang="zh">实际准时送达率 · 护栏</span></dt>
+      <dd><span lang="en">Whether the parcel's delivery scan comes before the promised date. The acceptance scan shows whether seller handling stayed on time, and the share of orders with tracking checks that a change in the on-time rate is not just missing tracking data.</span><span lang="zh">包裹的签收扫描是否早于预计送达时间。另看揽收扫描是否准时，用来检查卖家处理环节；再看有物流跟踪记录的订单占比，防止准时率的变化只是因为跟踪数据变少了。</span></dd>
+      <dt><span lang="en">Item-not-received rate · guardrail</span><span lang="zh">未收到货投诉率 · 护栏</span></dt>
+      <dd><span lang="en">Share of orders with an item-not-received (INR) claim within 30 days. Claims take time to arrive, so each week is flagged once it has a full 30 days behind it, and recent weeks can be left out.</span><span lang="zh">30 天内发起"未收到货"投诉（INR，Item Not Received）的订单占比。投诉要过一段时间才会到齐，所以每周都标了是否已满 30 天观察期，读数时可以排除还没成熟的近几周。</span></dd>
+      <dt><span lang="en">How to read it</span><span lang="zh">怎么读</span></dt>
+      <dd><span lang="en">Fewer promised days with on-time delivery flat or higher means the model found slack the rules had left. A clear drop in on-time delivery means promises were cut too far. A flat complaint rate fits the goal; claiming fewer complaints would need a drop on comparable orders.</span><span lang="zh">承诺天数下降、准时送达率持平或上升，说明模型找到了原规则多留的余量；准时率明显下降，说明承诺压得过短。投诉率持平与上线目标相容；要说投诉体验改善，需要在可比订单上看到投诉下降。</span></dd>
+    </dl>
+    <p class="note"><span lang="en">The dashboard can also split orders into those that used the model's date and those that did not. The two groups are not randomly assigned, so differences between them are used to diagnose shipping performance, not read as the model's effect.</span><span lang="zh">看板也能按"是否采用模型时间"把订单分成两组对比。这两组不是随机分出来的，组间差异只用来诊断物流表现，不当作模型的效果。</span></p>
+  </section>
+
+  <!-- 5. Sales, kept short -->
+  <section class="block" id="sales">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">Sales</span><span lang="zh">商业表现</span></p>
+      <h2><span lang="en">Sales are read as a share of demand, then against the same weeks in past years</span><span lang="zh">成交额先换算成市场份额，再和往年同期的走势比</span></h2>
+    </div>
+    <div class="prose">
+      <p><span lang="en">Sales (GMV) of Greater China sellers rise and fall with overall demand and the season. A plain before-and-after comparison can credit the model with a peak season or a market swing. So the dashboard first takes these sellers' share of total demand, indexes it to a base period before launch (base = 100), and compares its path with the same weeks in earlier years.</span><span lang="zh">大中华区卖家的成交额（GMV）会随整体市场需求和季节起伏。直接比较上线前后，容易把旺季或大盘变化算到模型头上。所以看板先算这些卖家占同期市场需求的份额，再以上线前的一段时间为基期换算成指数（基期 = 100），和往年同一段时间的走势比较。</span></p>
+      <p class="callout"><span lang="en">This part is descriptive. It shows whether the share moved away from its usual seasonal path, but it cannot show that the model added sales. The data also holds only completed orders, so it cannot see visits that did not turn into orders because of the delivery date shown.</span><span lang="zh">这一部分是描述性分析：它能提示份额是否偏离了往年的常见走势，但不能证明模型带来了成交增量。数据里也只有已成交的订单，看不到因为预计送达时间而没有下单的浏览。</span></p>
+    </div>
+  </section>
+
+  <!-- 6. Result: what I delivered, what the team can answer with it -->
+  <section class="block" id="result">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">Result</span><span lang="zh">结果</span></p>
+      <h2><span lang="en">Delivered a rollout dashboard the team can filter and split on its own</span><span lang="zh">交付了一个团队可以自己筛选、拆分的上线监控看板</span></h2>
+      <p style="margin-top:6px"><span class="verdict" style="--c:var(--slate)"><span lang="en">Delivered for weekly reporting and rollout feedback</span><span lang="zh">已交付，用于周报和上线反馈</span></span></p>
+    </div>
+    <div class="split">
+      <div class="col">
+        <h3><span lang="en">What I delivered</span><span lang="zh">交付了什么</span></h3>
+        <ul>
+          <li><span lang="en">Two pages. Sales: GMV, share of demand, indexes, and before-and-after against past years. Shipping: order mix, coverage and adoption, promised days, on-time delivery and complaints.</span><span lang="zh">两个页面。商业表现：成交额、市场份额、指数，以及上线前后与往年同期的比较。物流表现：订单结构、覆盖与采用、承诺天数、准时送达和投诉。</span></li>
+          <li><span lang="en">Filters for route, product category, seller region, item location, shipping option, tracking type, adoption, eligibility and seller management type.</span><span lang="zh">可按线路、品类、卖家地区、物品所在地、运输方式、物流跟踪类型、是否采用、是否符合条件、卖家管理类型筛选。</span></li>
+          <li><span lang="en">Two ways to read it: three years (2024–2026) side by side, or the current year split by eligibility, adoption or shipping option.</span><span lang="zh">两种看法：2024–2026 三年走势并排；或只看当年，按是否符合条件、是否采用、运输方式拆分。</span></li>
+          <li><span lang="en">Before, a new cut meant editing SQL, re-running it and rebuilding a slide. Now it is a filter change.</span><span lang="zh">以前换一个维度就要改 SQL、重新跑数、再做表；现在调一下筛选条件就行。</span></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><span lang="en">Questions the team can answer with it</span><span lang="zh">团队能用它回答的问题</span></h3>
+        <ul>
+          <li><span lang="en">For each shipping option, how much volume is within the model's scope, and how much of that used the model's date?</span><span lang="zh">各运输方式有多少订单在模型的使用范围内，其中多少实际采用了模型的时间？</span></li>
+          <li><span lang="en">Did the shorter promise come from seller handling, transit or the whole trip?</span><span lang="zh">承诺天数的缩短发生在卖家处理、运输，还是整体送达？</span></li>
+          <li><span lang="en">As promises got shorter, did on-time delivery or complaints get worse?</span><span lang="zh">承诺变短的同时，准时送达率和投诉率有没有变差？</span></li>
+          <li><span lang="en">How does Greater China sellers' share of demand compare with before launch and with the same weeks in past years?</span><span lang="zh">大中华区卖家的市场份额，相对上线前和往年同期的走势如何？</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="callout"><span lang="en">Evidence boundary: the dashboard is for monitoring and diagnosis. The material I have does not show that the model added sales, reduced complaints or raised overall on-time delivery. The adopted and not-adopted groups are observed, not assigned, and the comparison with past years is descriptive.</span><span lang="zh">证据边界：这个看板用于监控和诊断。现有材料没有验证模型带来的成交增量、投诉下降或整体准时率提升；采用与未采用两组是观察分组，与往年同期的比较是描述性分析。</span></p>
+    <p class="note"><a href="#dashboard"><span lang="en">See the dashboard ↓</span><span lang="zh">浏览看板 ↓</span></a></p>
+  </section>
+
+  <!-- 6b. The dashboard, rebuilt for the web. Same analysis as the one delivered (two tabs), drawn with the site's own
+       components. Every chart, KPI and formula is filled in by ../dash-edd.js from one set of illustrative data. -->
+  <section class="block" id="dashboard">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">The dashboard</span><span lang="zh">看板</span></p>
+      <h2><span lang="en">The same dashboard, rebuilt as part of this page</span><span lang="zh">按原看板的分析逻辑，重做成网页里的看板</span></h2>
+      <p class="dek"><span lang="en">Rebuilt from the dashboard I delivered during the internship; the data shown is illustrative.</span><span lang="zh">根据实习期间实际交付的看板重制，展示数据为示意。</span></p>
+    </div>
+
+    <div class="dash" data-dash data-edd-dash>
+      <div class="case-tabs" role="tablist" aria-label="Dashboard tabs">
+        <button type="button" role="tab" id="dashboard-gmv" aria-controls="dpanel-gmv" aria-selected="true"><span lang="en">GMV Performance</span><span lang="zh">GMV Performance · 商业表现</span></button>
+        <button type="button" role="tab" id="dashboard-shipping" aria-controls="dpanel-shipping" aria-selected="false" tabindex="-1"><span lang="en">Shipping Performance</span><span lang="zh">Shipping Performance · 物流表现</span></button>
+      </div>
+      <noscript><p class="note">The charts need JavaScript. 看板图表需要启用 JavaScript。</p></noscript>
+
+      <!-- GMV tab: windows → before / after → trends by year -->
+      <div class="dash-panel" id="dpanel-gmv" role="tabpanel" aria-labelledby="dashboard-gmv">
+        <div class="dash-block">
+          <h3 class="dash-h"><span lang="en">Base and exit windows</span><span lang="zh">基期与观察期</span></h3>
+          <dl class="defs four">
+            <div><dt><span lang="en">Base window</span><span lang="zh">基期</span></dt><dd><span lang="en">2026 weeks 1–4 (Jan 4–31)</span><span lang="zh">2026 年第 1–4 周（1/4–1/31）</span></dd></div>
+            <div><dt><span lang="en">Exit window</span><span lang="zh">观察期</span></dt><dd><span lang="en">2026 weeks 25–28 (Jun 21–Jul 18)</span><span lang="zh">2026 年第 25–28 周（6/21–7/18）</span></dd></div>
+            <div><dt><span lang="en">Seasonal baseline</span><span lang="zh">季节基线</span></dt><dd><span lang="en">The same weeks in 2024 and 2025</span><span lang="zh">2024、2025 年的同一批周次</span></dd></div>
+            <div><dt><span lang="en">Selected sellers</span><span lang="zh">选定卖家</span></dt><dd><span lang="en">Greater China sellers picked by the filters</span><span lang="zh">大中华区卖家中按筛选条件选出的一组</span></dd></div>
+          </dl>
+        </div>
+
+        <div class="dash-block">
+          <h3 class="dash-h"><span lang="en">Before and after, then against the season</span><span lang="zh">前后窗口对比，再扣除季节</span></h3>
+          <div class="stats five" id="gmv-kpis"></div>
+          <div class="split">
+            <div class="chart" id="gmv-db"></div>
+            <p class="caption" id="gmv-db-cap"></p>
+          </div>
+        </div>
+
+        <div class="dash-block">
+          <div class="dash-bar">
+            <h3 class="dash-h"><span lang="en">GMV and share of demand, by year</span><span lang="zh">历年 GMV 与市场份额</span></h3>
+            <div class="seg" role="group" aria-label="Scale" id="gmv-mode">
+              <button type="button" data-v="raw" aria-pressed="true"><span lang="en">Raw values</span><span lang="zh">原始值</span></button>
+              <button type="button" data-v="idx" aria-pressed="false"><span lang="en">Base-window index</span><span lang="zh">基期指数</span></button>
+            </div>
+          </div>
+          <ul class="key">
+            <li><span class="sw" style="--c:var(--y2024)"></span>2024</li>
+            <li><span class="sw" style="--c:var(--y2025)"></span>2025</li>
+            <li><span class="sw" style="--c:var(--y2026)"></span><span lang="en">2026 (rollout year)</span><span lang="zh">2026（上线年）</span></li>
+            <li><span lang="en">Shaded: base and exit windows</span><span lang="zh">阴影：基期与观察期</span></li>
+          </ul>
+          <div class="multiples">
+            <div><p class="m-title" id="gmv-t1-title"></p><div class="chart" id="gmv-t1"></div></div>
+            <div><p class="m-title" id="gmv-t2-title"></p><div class="chart" id="gmv-t2"></div></div>
+            <div><p class="m-title" id="gmv-t3-title"></p><div class="chart" id="gmv-t3"></div></div>
+          </div>
+          <p class="caption" id="gmv-read"></p>
+        </div>
+      </div>
+
+      <!-- Shipping tab: one shipping-option selector drives every chart below it -->
+      <div class="dash-panel" id="dpanel-shipping" role="tabpanel" aria-labelledby="dashboard-shipping">
+        <div class="dash-block">
+          <div class="dash-bar">
+            <div class="dash-ctl"><span lang="en">Shipping option</span><span lang="zh">物流方式</span>
+              <div class="seg" role="group" aria-label="Shipping option" id="ship-opt">
+                <button type="button" data-v="all" aria-pressed="true"><span lang="en">All</span><span lang="zh">全部</span></button>
+                <button type="button" data-v="speedpak" aria-pressed="false">SpeedPAK</button>
+                <button type="button" data-v="economy" aria-pressed="false">Economy</button>
+                <button type="button" data-v="express" aria-pressed="false">Express</button>
+                <button type="button" data-v="standard" aria-pressed="false">Standard</button>
+              </div>
+            </div>
+            <ul class="key">
+              <li><span class="sw" style="--c:var(--adopt)"></span><span lang="en">Used the model</span><span lang="zh">实际采用模型</span></li>
+              <li><span class="sw" style="--c:var(--elig)"></span><span lang="en">Eligible, not used</span><span lang="zh">符合条件但未采用</span></li>
+              <li><span class="sw" style="--c:var(--uncov)"></span><span lang="en">Not covered</span><span lang="zh">未覆盖</span></li>
+            </ul>
+          </div>
+          <p class="note" id="ship-scope"></p>
+        </div>
+
+        <div class="dash-block">
+          <div class="dash-bar">
+            <h3 class="dash-h"><span lang="en">Coverage and adoption</span><span lang="zh">覆盖与采用</span></h3>
+            <div class="dash-ctl"><span lang="en">Count by</span><span lang="zh">口径</span>
+              <div class="seg" role="group" aria-label="Count by" id="ship-basis">
+                <button type="button" data-v="n" aria-pressed="true"><span lang="en">Orders</span><span lang="zh">订单数</span></button>
+                <button type="button" data-v="g" aria-pressed="false"><span lang="en">Sales (GMV)</span><span lang="zh">成交额</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="eqs" id="ship-eqs"></div>
+          <div class="chart" id="ship-cov"></div>
+          <p class="caption"><span lang="en">Each bar is one week of orders, split into the three groups. The top of the light blue is coverage; dark blue over dark plus light blue is adoption. Hover a week for both rates.</span><span lang="zh">每根柱子是一周的订单，分成三组。浅蓝的上沿就是覆盖率；深蓝占「深蓝加浅蓝」的比例是采用率。鼠标停在某一周可以看到两个比例。</span></p>
+        </div>
+
+        <div class="dash-block">
+          <h3 class="dash-h"><span lang="en">Promised handling and transit time</span><span lang="zh">预计处理与运输时间</span></h3>
+          <div class="split">
+            <div class="edd" id="ship-edd"></div>
+            <div><p class="m-title"><span lang="en">Promised delivery days, by week</span><span lang="zh">每周的预计送达天数</span></p><div class="chart" id="ship-edd-line"></div></div>
+          </div>
+          <p class="caption"><span lang="en">Business days the buyer is promised. Period figures are order-weighted averages (total days ÷ orders); delivery = handling + transit.</span><span lang="zh">买家看到的承诺工作日。期内数字按订单加权平均（总天数 ÷ 订单数）；整体送达 = 处理 + 运输。</span></p>
+        </div>
+
+        <div class="dash-grid2">
+          <div class="dash-block">
+            <h3 class="dash-h"><span lang="en">On-time delivery</span><span lang="zh">实际准时送达率</span></h3>
+            <div class="chart" id="ship-ot"></div>
+            <p class="caption" id="ship-ot-cap"></p>
+          </div>
+          <div class="dash-block">
+            <h3 class="dash-h"><span lang="en">Item-not-received rate (30 days)</span><span lang="zh">未收到货投诉率（30 天）</span></h3>
+            <div class="chart" id="ship-inr"></div>
+            <p class="caption" id="ship-inr-cap"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Looking back -->
+  <section class="block" id="learned">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">Looking back</span><span lang="zh">复盘</span></p>
+      <h2><span lang="en">A filter can quietly change what a metric means</span><span lang="zh">一个筛选条件，可能悄悄改掉指标的意思</span></h2>
+    </div>
+    <div class="split">
+      <div class="col">
+        <h3><span lang="en">What I learned</span><span lang="zh">学到的</span></h3>
+        <p><span lang="en">The dashboard has a global filter for model eligibility. Apply it first and coverage always comes out at 100%, because the denominator has already been cut down to eligible orders. So the coverage and adoption block reads its own copy of the data and ignores that filter. When I design a metric now, I write its denominator down first and check which filters could change it.</span><span lang="zh">看板有一个全局筛选"是否符合模型条件"。如果先筛出符合条件的订单再算覆盖率，分母已经被砍成了符合条件的订单，结果永远是 100%。所以覆盖与采用这一块单独取数，不受这个筛选影响。现在设计指标时，我会先写清分母，再检查哪些筛选会改动它。</span></p>
+      </div>
+      <div class="col">
+        <h3><span lang="en">If I did it again</span><span lang="zh">如果重做</span></h3>
+        <ul>
+          <li><span lang="en">Replace the manual SQL export with a scheduled refresh.</span><span lang="zh">把手动跑 SQL、导出数据文件改成定时自动刷新。</span></li>
+          <li><span lang="en">With the rollout schedule in hand, compare routes that went live with routes not yet live (difference-in-differences). That says more about cause than before-and-after plus past years.</span><span lang="zh">如果能拿到上线分组信息，用已上线和未上线的线路做对照（双重差分），比只看前后和往年同期更能估计因果。</span></li>
+          <li><span lang="en">Add confidence intervals for small shipping options, so random swings are not read as the model's effect.</span><span lang="zh">给体量小的运输方式加置信区间，避免把随机波动读成模型效果。</span></li>
+        </ul>
+        <p class="note"><span lang="en">Tools: Hive SQL, Python (pandas), Plotly, Streamlit.</span><span lang="zh">工具：Hive SQL、Python（pandas）、Plotly、Streamlit。</span></p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <a href="../index.html"><span lang="en">← Back to home</span><span lang="zh">← 返回首页</span></a>
+    <span><span lang="en">All charts on this page use illustrative data. No internal table names, field names or business figures.</span><span lang="zh">本页图表均为示意数据，不含内部表名、字段名和业务数值。</span></span>
+  </footer>
+</main>
+
+<script src="../kit.js"></script>
+<script>Kit.initToggles();</script>
+<script src="../site.js"></script>
+<script src="../dash-edd.js"></script>
+</body>
+</html>

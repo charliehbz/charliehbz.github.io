@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="zh" data-lang="zh" data-default-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>eBay 交易风险｜高风险成交占比上升，是谁推高的？· 案例</title>
+<meta name="description" content="案例：拆解 eBay Fashion 高风险成交占比的异动，用 Shift-Share 把变化分到每个品类，定位主要品类、市场和卖家群体。">
+<meta property="og:title" content="eBay 交易风险｜高风险成交占比上升，是谁推高的？">
+<meta property="og:description" content="先拆分子分母，再用贡献分解把整体变化落到每个品类。">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../site.css">
+<!--
+  案例页：Fashion PRCI 高风险成交占比异动。事实来自个人复盘文档；公开版不写内部表名、卖家 ID、规则阈值和业务数值。
+  看板由 ../dash-prci.js 用一套示意数据画出。每段可见文字都是 en / zh 一对。
+-->
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="who" href="../index.html"><span lang="en">Portfolio</span><span lang="zh">求职作品集</span></a>
+    <nav class="pages" aria-label="Pages">
+      <a href="../index.html"><span lang="en">Home</span><span lang="zh">首页</span></a>
+      <a href="../index.html#projects" aria-current="page"><span lang="en">Projects</span><span lang="zh">项目</span></a>
+    </nav>
+    <div class="toggles">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+        <button type="button" data-set-lang="zh" aria-pressed="true">中文</button>
+      </div>
+      <div class="seg" role="group" aria-label="Theme">
+        <button type="button" data-set-theme="light" aria-pressed="false"><span lang="en">Light</span><span lang="zh">浅色</span></button>
+        <button type="button" data-set-theme="dark" aria-pressed="false"><span lang="en">Dark</span><span lang="zh">深色</span></button>
+        <button type="button" data-set-theme="auto" aria-pressed="true"><span lang="en">Auto</span><span lang="zh">自动</span></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="../index.html"><span lang="en">Home</span><span lang="zh">首页</span></a><span aria-hidden="true">›</span>
+    <a href="../index.html#projects"><span lang="en">Projects</span><span lang="zh">项目</span></a><span aria-hidden="true">›</span>
+    <span aria-current="page"><span lang="en">eBay trust and risk</span><span lang="zh">eBay 交易风险</span></span>
+  </nav>
+
+  <div class="masthead">
+    <p class="eyebrow"><span lang="en">eBay · Trust and risk · Internship project</span><span lang="zh">eBay · 交易风险 · 实习项目</span></p>
+    <h1><span lang="en">eBay trust and risk: the high-risk share of Fashion sales rose. What pushed it up?</span><span lang="zh">eBay 交易风险｜高风险成交占比上升，是谁推高的？</span></h1>
+    <p class="lede"><span lang="en">The high-risk share (High Risk GMV Mix) is the part of Fashion's sales (GMV) that comes from high-risk sellers; a seller's risk tier comes from the team's PRCI tiering (high, medium, low). At the end of June 2026 this share turned up again. I built the data from transaction detail, split the change by category, seller and market, and used a shift-share decomposition to assign it to each category, to find what was pushing it up.</span><span lang="zh">高风险成交占比（High Risk GMV Mix）是 Fashion 总成交额（GMV）中来自高风险卖家的比例；卖家的风险等级来自团队的 PRCI 分层（高、中、低三档）。2026 年 6 月底，这个比例又往上走了。我从交易明细搭数据，按品类、卖家和市场拆开，再用 Shift-Share 把整体变化分到每个品类，找出是谁在推高它。</span></p>
+  </div>
+
+  <!-- 1. My part, first -->
+  <section class="block" id="role">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">My part</span><span lang="zh">我的贡献</span></p>
+      <h2><span lang="en">I did the data, the decomposition and the dashboard on my own</span><span lang="zh">数据、贡献分解和看板由我独立完成</span></h2>
+    </div>
+    <dl class="facts wide">
+      <dt><span lang="en">Framing</span><span lang="zh">定义问题</span></dt>
+      <dd><span lang="en">Turned "the metric went up" into questions that can be checked: numerator and denominator first, then six ways to slice, then a decomposition that puts a number on each category.</span><span lang="zh">把"指标涨了"变成可以核验的问题：先拆分子分母，再按六个维度切分，最后用贡献分解把变化量化到每个品类。</span></dd>
+      <dt><span lang="en">Data in Spark SQL</span><span lang="zh">用 Spark SQL 建宽表</span></dt>
+      <dd><span lang="en">Starting from transaction detail, built a seller × retail week × dimension table joined to category, seller market, risk tier, managed status, seller tenure and action records: 54 retail weeks, over 1,000 third-level categories, about 2.35 million rows.</span><span lang="zh">从交易明细出发，建「卖家 × 零售周 × 维度」宽表，关联品类、卖家市场、风险分层、托管状态、新老卖家和处置记录，覆盖 54 个零售周、1,000 多个三级品类，约 235 万行。</span></dd>
+      <dt><span lang="en">Checks</span><span lang="zh">核验口径</span></dt>
+      <dd><span lang="en">Fixed four things that would have bent the numbers: action records de-duplicated by seller and route together; the seller-concentration data keeps every risk tier, so total GMV is not counted as high-risk GMV; an unused join removed; unmatched categories kept as "other" so totals and the decomposition reconcile.</span><span lang="zh">修正了四处会让数字失真的实现问题：处置清单按卖家和线路一起去重；卖家集中度数据保留全部风险等级，避免把总成交额算成高风险成交额；删掉没被用到的关联表；匹配不上的品类归入「其他」，保证总额和贡献分解对得上。</span></dd>
+      <dt><span lang="en">Decomposition</span><span lang="zh">贡献分解</span></dt>
+      <dd><span lang="en">Implemented the shift-share (CTV) in pandas, splitting the overall change into a rate effect and a mix effect for each category, and checked that the contributions add up to the overall change.</span><span lang="zh">用 Pandas 实现 Shift-Share（CTV），把整体变化拆成每个品类的 Rate 效应和 Mix 效应，并核对各品类贡献之和等于整体变化。</span></dd>
+      <dt><span lang="en">Dashboard</span><span lang="zh">搭建看板</span></dt>
+      <dd><span lang="en">Built a five-page dashboard in Plotly and Streamlit: category trends, seller concentration, contribution analysis, segments and category concentration.</span><span lang="zh">用 Plotly 和 Streamlit 做成五页看板：品类趋势、卖家集中度、贡献分解、分群对比、品类集中度。</span></dd>
+      <dt><span lang="en">Not mine</span><span lang="zh">不由我负责</span></dt>
+      <dd><span lang="en">Risk rules, strategy and the actions taken belong to the team.</span><span lang="zh">风险规则、策略和具体处置由团队决定和执行。</span></dd>
+    </dl>
+  </section>
+
+  <!-- 2. Context -->
+  <section class="block" id="context">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">Context</span><span lang="zh">背景</span></p>
+      <h2><span lang="en">Fashion's high-risk share has long run high, and turned up again in late June</span><span lang="zh">Fashion 的高风险成交占比一直偏高，6 月底又往上走</span></h2>
+    </div>
+    <div class="prose">
+      <p><span lang="en">eBay's Shipping &amp; Trust team watches risk and experience metrics to spot problems that could hurt buyers, sellers and trust in the marketplace, and supplies the data for risk governance. Monitoring across verticals showed that Fashion's high-risk share had long been above most other verticals, and that it rose again at the end of June 2026.</span><span lang="zh">eBay 的 Shipping &amp; Trust 团队监控风险和体验指标，找出可能影响买家体验、卖家经营和平台交易信任的问题，为风险治理提供数据支持。跨类目的监控显示，Fashion 的高风险成交占比长期高于多数类目，并在 2026 年 6 月底出现新的上行。</span></p>
+      <p><span lang="en">The team wanted to know two things: which third-level categories the change came from, and whether the risk sat with a few high-risk sellers. The formal analysis compares three retail weeks before and after the end of June (Jun 7–21 vs Jun 28–Jul 12, 2026).</span><span lang="zh">团队想知道两件事：变化主要出在哪些三级品类；风险是不是集中在少数高风险卖家身上。正式分析比较 6 月底前后各三个零售周（2026 年 6/7–6/21 对 6/28–7/12）。</span></p>
+    </div>
+  </section>
+
+  <!-- 3. Method: numerator and denominator, then shift-share -->
+  <section class="block" id="method">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">Method</span><span lang="zh">怎么拆</span></p>
+      <h2><span lang="en">A rising share does not mean more high-risk sales</span><span lang="zh">比例上升，不等于高风险成交额在增长</span></h2>
+    </div>
+    <div class="split">
+      <div class="col">
+        <p><span lang="en">The high-risk share = high-risk sellers' GMV ÷ all Fashion GMV. As a ratio it can rise because the top grows or because the bottom shrinks. Checking both showed that high-risk GMV itself fell between the two windows; all Fashion GMV fell faster, so the share edged up.</span><span lang="zh">高风险成交占比 = 高风险卖家成交额 ÷ Fashion 总成交额。它是比例，上涨可能来自分子变大，也可能来自分母变小。核验后发现，两个窗口之间高风险成交额本身是下降的，只是 Fashion 总成交额降得更多，比例才小幅上升。</span></p>
+        <p><span lang="en">Ranking categories by how much they moved cannot tell a category that got riskier from one that simply got bigger, and a small category's big swing can matter less than a large category's small one. So the overall share is written as a sum over categories, and its change is split exactly.</span><span lang="zh">只按各品类的涨跌排序，分不清是品类内部变得更"高风险"，还是品类只是变重了；小品类的大幅波动，也可能比不上大品类的小幅变化。所以把整体占比写成各品类之和，再把它的变化精确拆开。</span></p>
+      </div>
+      <dl class="facts">
+        <dt><span lang="en">Overall share</span><span lang="zh">整体占比</span></dt>
+        <dd><span lang="en">R = Σ (category's weight in Fashion GMV × category's high-risk share).</span><span lang="zh">R = Σ（品类在 Fashion 成交额中的权重 × 品类内部的高风险占比）。</span></dd>
+        <dt><span lang="en">Rate effect</span><span lang="zh">Rate 效应</span></dt>
+        <dd><span lang="en">Change in the category's own high-risk share × its weight after. Did the category itself get riskier?</span><span lang="zh">品类内部高风险占比的变化 × 观察期的品类权重。回答"这个品类自己变得更'高风险'了吗"。</span></dd>
+        <dt><span lang="en">Mix effect</span><span lang="zh">Mix 效应</span></dt>
+        <dd><span lang="en">Change in the category's weight × (its share before − the overall share before). Did an above-average category get heavier?</span><span lang="zh">品类权重的变化 ×（该品类基期占比 − 整体基期占比）。回答"一个高于平均的品类，是不是在整体里变重了"。</span></dd>
+        <dt><span lang="en">CTV</span><span lang="zh">CTV</span></dt>
+        <dd><span lang="en">A category's contribution ÷ the overall change. They sum to 100%; when pushes and pulls offset and the net change is small, one category can be above 100% or negative.</span><span lang="zh">品类贡献 ÷ 整体变化。各品类合计为 100%；正负相互抵消、整体变化很小时，单个品类可以超过 100%，也可以是负数。</span></dd>
+        <dt><span lang="en">Check</span><span lang="zh">核对</span></dt>
+        <dd><span lang="en">Rate plus mix, summed over all categories, must equal the overall share after minus before.</span><span lang="zh">所有品类的 Rate 加 Mix 之和，必须等于观察期减基期的整体变化。</span></dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 4. Result -->
+  <section class="block" id="result">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">Result</span><span lang="zh">结果</span></p>
+      <h2><span lang="en">Narrowed it to one category, one market and the mid-tier sellers</span><span lang="zh">定位到一个主要品类、一个市场和一群中腰部卖家</span></h2>
+      <p style="margin-top:6px"><span class="verdict" style="--c:var(--hr)"><span lang="en">Analysis done; decisions on action still in progress</span><span lang="zh">分析已完成，治理决策仍在推进</span></span></p>
+    </div>
+    <div class="split">
+      <div class="col">
+        <h3><span lang="en">What the analysis found</span><span lang="zh">定位到了什么</span></h3>
+        <ul>
+          <li><span lang="en">The late-June rise was driven mainly by Men's Shoes, and mostly by a higher high-risk share inside the category (rate effect) rather than by Men's Shoes getting heavier. Other categories pulled the other way, so the overall share rose only a little.</span><span lang="zh">6 月底的上行主要由男鞋推动，而且主要来自男鞋内部高风险卖家占比上升（Rate 效应），而不是男鞋在 Fashion 里变重。其他品类有明显的反向抵消，所以整体只小幅上升。</span></li>
+          <li><span lang="en">The largest high-risk category by volume is Men's Clothing; this time it was among the categories pulling the share down.</span><span lang="zh">体量最大的高风险品类是男装；这一次它属于往下拉的品类。</span></li>
+          <li><span lang="en">By market, HIPO was the only one whose own high-risk share rose.</span><span lang="zh">按市场看，HIPO 是唯一内部高风险占比上升的市场。</span></li>
+          <li><span lang="en">High-risk GMV is not concentrated at the top: the top 10 sellers hold a small part, and the largest bucket is sellers ranked 101–500.</span><span lang="zh">高风险成交额并不集中在头部：前 10 名卖家只占一小部分，占比最大的一组是排名 101–500 的中腰部卖家。</span></li>
+          <li><span lang="en">Ever-actioned, existing and unmanaged sellers show patterns worth watching, but explaining them needs time-aware labels or a comparison group.</span><span lang="zh">曾被处置、老卖家和非托管卖家呈现值得持续关注的特征，但要解释原因，需要按时间区分的标签或对照分析。</span></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><span lang="en">What I handed over</span><span lang="zh">交付了什么</span></h3>
+        <ul>
+          <li><span lang="en">The location of the change, the main contributors and the seller concentration, as evidence for the team's next steps.</span><span lang="zh">异常出在哪里、主要贡献因素和卖家集中度，作为团队下一步的事实依据。</span></li>
+          <li><span lang="en">A five-page dashboard that drills from the overall share down to categories and sellers; the formal three-week-versus-three-week window is used throughout.</span><span lang="zh">一个五页看板，可以从整体异常下钻到品类和卖家；全程统一使用三周对三周的正式窗口。</span></li>
+        </ul>
+        <h3><span lang="en">Directions suggested to the team</span><span lang="zh">提给团队的排查方向</span></h3>
+        <ul>
+          <li><span lang="en">Look first at Men's Shoes sellers and their risk patterns, and at the HIPO market.</span><span lang="zh">优先排查男鞋相关卖家和风险模式，重点关注 HIPO 市场。</span></li>
+          <li><span lang="en">For mid-tier sellers, consider rules, models or batch monitoring rather than case-by-case work on the top sellers.</span><span lang="zh">对中腰部卖家考虑系统性的规则、模型或批量监控，而不只逐个治理头部卖家。</span></li>
+          <li><span lang="en">For actioned sellers, monitor recurrence with before/after states. The strategy team decides the actual rules, weighing cost, coverage and false positives.</span><span lang="zh">为曾被处置的卖家建立区分处置前后的复发监控。具体规则由风险策略团队结合成本、覆盖率和误伤风险决定。</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="callout"><span lang="en">Evidence boundary: the project located and quantified the change; actions are still being decided, so there is no measured improvement. Risk tiers are the latest snapshot applied to all past weeks, so the analysis describes how today's high-risk sellers contributed over time, not the risk as labelled in each week. "Ever actioned" is a seller attribute and says nothing about whether actions worked.</span><span lang="zh">证据边界：项目完成的是定位和量化归因，治理措施还在推进，没有可验证的指标改善。风险等级用的是跑表时的最新快照，回填到所有历史周，描述的是「当前高风险卖家在历史上的贡献」，不是每周当时的风险暴露。「曾被处置」是卖家属性，不能说明处置有效或无效。</span></p>
+    <p class="note"><a href="#prci-dashboard"><span lang="en">See the dashboard ↓</span><span lang="zh">浏览看板 ↓</span></a></p>
+  </section>
+
+  <!-- 5. The dashboard, rebuilt for the web: the five pages of the delivered one, drawn by ../dash-prci.js from illustrative data -->
+  <section class="block" id="prci-dashboard">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">The dashboard</span><span lang="zh">看板</span></p>
+      <h2><span lang="en">The five pages of the dashboard, rebuilt as part of this page</span><span lang="zh">按原看板的五页内容，重做成网页里的看板</span></h2>
+      <p class="dek"><span lang="en">Rebuilt from the dashboard I delivered during the internship; the data shown is illustrative.</span><span lang="zh">根据实习期间实际交付的看板重制，展示数据为示意。</span></p>
+    </div>
+
+    <div class="dash" data-dash data-prci-dash>
+      <div class="case-tabs" role="tablist" aria-label="Dashboard pages">
+        <button type="button" role="tab" id="prci-dashboard-cat" aria-controls="p-panel-cat" aria-selected="true"><span lang="en">Category trends</span><span lang="zh">品类趋势</span></button>
+        <button type="button" role="tab" id="prci-dashboard-ctv" aria-controls="p-panel-ctv" aria-selected="false" tabindex="-1"><span lang="en">Contributions (CTV)</span><span lang="zh">贡献分解 · CTV</span></button>
+        <button type="button" role="tab" id="prci-dashboard-seller" aria-controls="p-panel-seller" aria-selected="false" tabindex="-1"><span lang="en">Seller concentration</span><span lang="zh">卖家集中度</span></button>
+        <button type="button" role="tab" id="prci-dashboard-seg" aria-controls="p-panel-seg" aria-selected="false" tabindex="-1"><span lang="en">Segments</span><span lang="zh">分群对比</span></button>
+        <button type="button" role="tab" id="prci-dashboard-catcon" aria-controls="p-panel-catcon" aria-selected="false" tabindex="-1"><span lang="en">Category concentration</span><span lang="zh">品类集中度</span></button>
+      </div>
+      <noscript><p class="note">The charts need JavaScript. 看板图表需要启用 JavaScript。</p></noscript>
+
+      <!-- 1. Category trends -->
+      <div class="dash-panel" id="p-panel-cat" role="tabpanel" aria-labelledby="prci-dashboard-cat">
+        <div class="dash-block">
+          <div class="dash-ctl"><span lang="en">Category</span><span lang="zh">品类</span></div>
+          <div class="chip-pick" role="group" aria-label="Category" id="p-cat-pick"></div>
+          <p class="caption" id="p-cat-cap"></p>
+        </div>
+        <div class="dash-grid2">
+          <div class="dash-block">
+            <h3 class="dash-h"><span lang="en">High-risk share of GMV, by week</span><span lang="zh">每周的高风险成交占比</span></h3>
+            <ul class="key">
+              <li><span class="sw" style="--c:var(--ink)"></span><span lang="en">Fashion overall</span><span lang="zh">Fashion 整体</span></li>
+              <li><span class="sw" style="--c:var(--hr)"></span><span lang="en">Chosen category</span><span lang="zh">所选品类</span></li>
+            </ul>
+            <div class="chart" id="p-cat-mix"></div>
+          </div>
+          <div class="dash-block">
+            <div class="dash-bar">
+              <h3 class="dash-h" id="p-risk-title"></h3>
+              <div class="seg" role="group" aria-label="Risk metric" id="p-metric">
+                <button type="button" data-v="inr" aria-pressed="true">INR</button>
+                <button type="button" data-v="snad" aria-pressed="false">SNAD</button>
+                <button type="button" data-v="loss" aria-pressed="false">LOSS</button>
+              </div>
+            </div>
+            <ul class="key">
+              <li><span class="sw" style="--c:var(--hr)"></span><span lang="en">High-risk sellers</span><span lang="zh">高风险卖家</span></li>
+              <li><span class="sw" style="--c:var(--nonhr)"></span><span lang="en">Other sellers</span><span lang="zh">其他卖家</span></li>
+            </ul>
+            <div class="chart" id="p-cat-risk"></div>
+            <p class="caption"><span lang="en">30-day measures need 30 days to settle, so weeks after Jun 14 are not drawn.</span><span lang="zh">30 天类指标要等 30 天才完整，6/14 之后的周不画线。</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Contributions -->
+      <div class="dash-panel" id="p-panel-ctv" role="tabpanel" aria-labelledby="prci-dashboard-ctv">
+        <div class="dash-block">
+          <div class="eqs" id="p-ctv-eqs"></div>
+          <div class="dash-bar">
+            <h3 class="dash-h"><span lang="en">Each category's contribution to the change, pp</span><span lang="zh">各品类对整体变化的贡献（pp）</span></h3>
+            <ul class="key">
+              <li><span class="sw" style="--c:var(--rate-eff)"></span><span lang="en">Rate effect</span><span lang="zh">Rate 效应</span></li>
+              <li><span class="sw" style="--c:var(--mix-eff)"></span><span lang="en">Mix effect</span><span lang="zh">Mix 效应</span></li>
+              <li><span class="sw" style="--c:var(--ink)"></span><span lang="en">Total</span><span lang="zh">合计</span></li>
+            </ul>
+          </div>
+          <div class="chart" id="p-ctv-bars"></div>
+          <p class="caption"><span lang="en">Right of zero pushes the share up, left pulls it down. The rows add up to the overall change exactly; hover a row for its CTV.</span><span lang="zh">零线右边是推高，左边是拉低。各行加起来正好等于整体变化；鼠标停在某一行可以看到它的 CTV。</span></p>
+        </div>
+        <div class="dash-block">
+          <h3 class="dash-h"><span lang="en">The same numbers as a table</span><span lang="zh">同一组数字的明细表</span></h3>
+          <div class="table-wrap"><table id="p-ctv-table"></table></div>
+          <p class="caption"><span lang="en">Click a column header to sort. CTV can exceed 100% when other categories offset; it is a share of a small net change.</span><span lang="zh">点表头可以排序。其他品类抵消、整体变化很小时，CTV 会超过 100%：它是相对一个很小的净变化而言的。</span></p>
+        </div>
+      </div>
+
+      <!-- 3. Seller concentration -->
+      <div class="dash-panel" id="p-panel-seller" role="tabpanel" aria-labelledby="prci-dashboard-seller">
+        <div class="dash-block">
+          <div class="dash-bar">
+            <h3 class="dash-h"><span lang="en">High-risk GMV by seller rank</span><span lang="zh">高风险成交额按卖家排名分组</span></h3>
+            <div class="seg" role="group" aria-label="Window" id="p-sel-win">
+              <button type="button" data-v="pre" aria-pressed="false"><span lang="en">Before</span><span lang="zh">基期</span></button>
+              <button type="button" data-v="post" aria-pressed="true"><span lang="en">After</span><span lang="zh">观察期</span></button>
+            </div>
+          </div>
+          <div class="eqs" id="p-sel-eqs"></div>
+          <div class="chart" id="p-sel-chart"></div>
+          <p class="caption"><span lang="en">Bars: each rank group's share of high-risk GMV. Line: the cumulative share from the top down. The underlying data keeps every risk tier so the totals are right.</span><span lang="zh">柱子是每个排名组占高风险成交额的比例，折线是从头部往下的累计占比。底层数据保留全部风险等级，保证总额正确。</span></p>
+        </div>
+      </div>
+
+      <!-- 4. Segments -->
+      <div class="dash-panel" id="p-panel-seg" role="tabpanel" aria-labelledby="prci-dashboard-seg">
+        <div class="dash-block">
+          <div class="dash-bar">
+            <h3 class="dash-h"><span lang="en">High-risk share within each segment, before to after</span><span lang="zh">各分群内部的高风险占比：基期 → 观察期</span></h3>
+            <div class="seg" role="group" aria-label="Segment" id="p-seg-dim">
+              <button type="button" data-v="market" aria-pressed="true"><span lang="en">Market</span><span lang="zh">市场</span></button>
+              <button type="button" data-v="managed" aria-pressed="false"><span lang="en">Managed</span><span lang="zh">托管</span></button>
+              <button type="button" data-v="tenure" aria-pressed="false"><span lang="en">Tenure</span><span lang="zh">新老卖家</span></button>
+              <button type="button" data-v="action" aria-pressed="false"><span lang="en">Actions</span><span lang="zh">处置记录</span></button>
+            </div>
+          </div>
+          <div class="chart" id="p-seg-chart"></div>
+          <p class="caption" id="p-seg-cap"></p>
+        </div>
+      </div>
+
+      <!-- 5. Category concentration -->
+      <div class="dash-panel" id="p-panel-catcon" role="tabpanel" aria-labelledby="prci-dashboard-catcon">
+        <div class="dash-block">
+          <h3 class="dash-h"><span lang="en">How concentrated high-risk GMV is across categories</span><span lang="zh">高风险成交额在品类之间有多集中</span></h3>
+          <div class="eqs" id="p-cc-eqs"></div>
+          <ul class="key">
+            <li><span class="sw" style="--c:var(--nonhr)"></span><span lang="en">Before</span><span lang="zh">基期</span></li>
+            <li><span class="sw" style="--c:var(--hr)"></span><span lang="en">After</span><span lang="zh">观察期</span></li>
+          </ul>
+          <div class="chart" id="p-cc-chart"></div>
+          <p class="caption"><span lang="en">Categories ranked by high-risk GMV within each window; the line is the running total. The illustrative set has 40 categories instead of the 1,000-plus in the real data.</span><span lang="zh">每个窗口内按高风险成交额给品类排名，折线是累计占比。示意数据只有 40 个品类，真实数据有 1,000 多个。</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Looking back -->
+  <section class="block" id="learned">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">Looking back</span><span lang="zh">复盘</span></p>
+      <h2><span lang="en">Split the ratio first, then decompose instead of ranking</span><span lang="zh">先拆分子分母，再用贡献分解代替排序</span></h2>
+    </div>
+    <div class="split">
+      <div class="col">
+        <h3><span lang="en">What I learned</span><span lang="zh">学到的</span></h3>
+        <p><span lang="en">The headline here was a ratio, and its numerator was actually falling. Checking both parts first stopped the analysis from chasing "more high-risk sales" that did not exist. And a small net change can hide large moves that cancel out: only an exact decomposition shows where to look first.</span><span lang="zh">这次的指标是比例，而它的分子其实在下降。先核对分子分母，分析才没有去追一个并不存在的"高风险成交额增长"。另外，很小的净变化下面，可能是一大一小相互抵消的变化；只有精确的贡献分解，才知道该先查哪里。</span></p>
+      </div>
+      <div class="col">
+        <h3><span lang="en">If I did it again</span><span lang="zh">如果重做</span></h3>
+        <ul>
+          <li><span lang="en">Use a seller × effective-week history of risk tiers, so each week carries the tier that applied then.</span><span lang="zh">用「卖家 × 生效周」的历史快照，按周取当时有效的风险等级，而不是用最新快照回填。</span></li>
+          <li><span lang="en">Make "actioned" time-aware: before the action, after it, and never; to judge effect, compare with similar sellers who were not actioned.</span><span lang="zh">以处置周为起点，把卖家分成处置前、处置后和从未处置；要评估效果，再匹配处置前风险和规模相近的对照卖家。</span></li>
+          <li><span lang="en">Automate the checks on joins, missing values and the decomposition's sum.</span><span lang="zh">把关联核对、缺失率和贡献加总校验做成自动检查。</span></li>
+          <li><span lang="en">Align the background monitoring chart with the formal analysis on market scope, denominator and definitions.</span><span lang="zh">把背景监控图和正式分析的市场范围、分母和口径统一。</span></li>
+        </ul>
+        <p class="note"><span lang="en">Tools: Spark SQL, Python (pandas), Plotly, Streamlit.</span><span lang="zh">工具：Spark SQL、Python（pandas）、Plotly、Streamlit。</span></p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <a href="../index.html"><span lang="en">← Back to home</span><span lang="zh">← 返回首页</span></a>
+    <span><span lang="en">All charts on this page use illustrative data. No internal table names, seller IDs, rule thresholds or business figures.</span><span lang="zh">本页图表均为示意数据，不含内部表名、卖家 ID、规则阈值和业务数值。</span></span>
+  </footer>
+</main>
+
+<script src="../kit.js"></script>
+<script>Kit.initToggles();</script>
+<script src="../site.js"></script>
+<script src="../dash-prci.js"></script>
+</body>
+</html>

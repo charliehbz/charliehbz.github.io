@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh" data-lang="zh" data-default-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>求职作品集 · 数据分析、商业分析、供应链与 AI 产品运营</title>
+<meta name="description" content="数据分析、商业分析、供应链管理和 AI 产品运营方向的求职作品集。第一个案例：eBay 跨境物流预计送达时间模型的上线监控。">
+<meta property="og:title" content="求职作品集 · 数据分析、商业分析、供应链与 AI 产品运营">
+<meta property="og:description" content="案例：eBay 跨境物流｜更短的预计送达时间，能否兑现？">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="kit.css">
+<link rel="stylesheet" href="site.css">
+<!--
+  首页。每段可见文字都是一对：<span lang="en">…</span><span lang="zh">…</span>，改的时候两半都改。
+  加新案例：复制 .case-list 里的整个 <li>，改颜色（--c）、文字和链接；案例页复制 cases/ebay-edd.html 再改。
+  姓名、学校、联系方式之后补在 masthead 里（模板的 .links 和 .stats 写法见 personal-site-design/template）。
+-->
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="who" href="index.html"><span lang="en">Portfolio</span><span lang="zh">求职作品集</span></a>
+    <nav class="pages" aria-label="Sections">
+      <a href="#projects"><span lang="en">Projects</span><span lang="zh">项目</span></a>
+    </nav>
+    <div class="toggles">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+        <button type="button" data-set-lang="zh" aria-pressed="true">中文</button>
+      </div>
+      <div class="seg" role="group" aria-label="Theme">
+        <button type="button" data-set-theme="light" aria-pressed="false"><span lang="en">Light</span><span lang="zh">浅色</span></button>
+        <button type="button" data-set-theme="dark" aria-pressed="false"><span lang="en">Dark</span><span lang="zh">深色</span></button>
+        <button type="button" data-set-theme="auto" aria-pressed="true"><span lang="en">Auto</span><span lang="zh">自动</span></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+
+  <div class="masthead">
+    <p class="eyebrow"><span lang="en">Data analytics · Business analytics · Supply chain management · AI product operations</span><span lang="zh">数据分析 · 商业分析 · 供应链管理 · AI 产品运营</span></p>
+    <h1><span lang="en">Turning a business question into metrics a team can track, and a tool it can check on its own</span><span lang="zh">把业务问题拆成能追踪的指标，再做成团队自己能查的工具</span></h1>
+    <p class="lede"><span lang="en">Looking for roles in data analytics, business analytics, supply chain management and AI product operations. During my internship with eBay's Shipping &amp; Trust analytics team, I designed the monitoring metrics for a delivery-date model that went live in phases, prepared the data in SQL and built a dashboard the team could use on its own; I also broke down a rise in Fashion's high-risk share of sales.</span><span lang="zh">正在找数据分析、商业分析、供应链管理和 AI 产品运营方向的岗位。在 eBay 物流与交易信任（Shipping &amp; Trust）分析团队实习时，我为一个分阶段上线的预计送达时间模型设计了监控指标，用 SQL 准备数据，并搭建了团队可以自助使用的看板；也拆解过 Fashion 高风险成交占比的一次异动。</span></p>
+  </div>
+
+  <section class="block" id="projects">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">Projects</span><span lang="zh">项目</span></p>
+      <h2><span lang="en">Each case says what I owned and where the evidence stops</span><span lang="zh">写清我负责的部分，也写清证据的边界</span></h2>
+    </div>
+
+    <!-- 一个 <li> 一个案例。--c 是这类工作的颜色：物流配送 slate；数据与工具 sky；电商运营 navy（见 DESIGN.md） -->
+    <ol class="case-list">
+      <li class="has-shot" style="--c:var(--slate)">
+        <div class="cl-meta">
+          <p class="eyebrow"><span lang="en">eBay · Cross-border shipping · Internship</span><span lang="zh">eBay · 跨境物流 · 实习项目</span></p>
+          <h3><a href="cases/ebay-edd.html"><span lang="en">eBay cross-border shipping: shorter delivery promises, but can they be kept?</span><span lang="zh">eBay 跨境物流｜更短的预计送达时间，能否兑现？</span></a></h3>
+        </div>
+        <!-- Preview: 100 orders as dots. The toggle (site.js) swaps the numerator and denominator; CSS does the rest. Illustrative numbers. -->
+        <figure class="cl-shot cov-demo" data-cov-demo data-mode="cov">
+          <div class="cov-top">
+            <p class="cov-title"><span lang="en">Coverage and adoption, on 100 orders</span><span lang="zh">覆盖与采用：同样 100 个订单，两个分母</span></p>
+            <div class="seg" role="group" aria-label="Metric">
+              <button type="button" data-mode="cov" aria-pressed="true"><span lang="en">Model coverage</span><span lang="zh">模型覆盖</span></button>
+              <button type="button" data-mode="adopt" aria-pressed="false"><span lang="en">Actual adoption</span><span lang="zh">实际采用</span></button>
+            </div>
+          </div>
+          <div class="cov-body">
+            <div class="cov-grid" role="img" aria-label="100 个订单：20 个实际采用模型，60 个符合条件但未采用，20 个未覆盖 / 100 orders: 20 used the model, 60 eligible but not used, 20 not covered"><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i></div>
+            <div class="cov-read" aria-live="polite">
+              <p class="cov-name" data-show="cov"><span lang="en">Coverage</span><span lang="zh">覆盖率</span></p>
+              <p class="cov-name" data-show="adopt"><span lang="en">Adoption among eligible orders</span><span lang="zh">符合条件订单中的采用率</span></p>
+              <p class="cov-eq" data-show="cov"><span class="num">80</span> / 100 = 80%</p>
+              <p class="cov-eq" data-show="adopt"><span class="num">20</span> / 80 = 25%</p>
+              <p class="cov-def" data-show="cov"><span lang="en">Numerator: the 80 orders that meet the model's conditions (dark and light blue). Denominator: all 100 orders.</span><span lang="zh">分子：符合模型使用条件的 80 个订单（深蓝加浅蓝）。分母：全部 100 个订单。</span></p>
+              <p class="cov-def" data-show="adopt"><span lang="en">Numerator: the 20 orders that used the model's date (dark blue). The denominator shrinks to the 80 eligible orders; the 20 grey ones drop out.</span><span lang="zh">分子：实际采用模型时间的 20 个订单（深蓝）。分母缩小到符合条件的 80 个，灰色的 20 个不再计入。</span></p>
+              <ul class="key">
+                <li><span class="sw" style="--c:var(--adopt)"></span><span lang="en">Used the model · 20</span><span lang="zh">实际采用模型 · 20</span></li>
+                <li><span class="sw" style="--c:var(--elig)"></span><span lang="en">Eligible, not used · 60</span><span lang="zh">符合条件但未采用 · 60</span></li>
+                <li><span class="sw" style="--c:var(--uncov)"></span><span lang="en">Not covered · 20</span><span lang="zh">未覆盖 · 20</span></li>
+              </ul>
+            </div>
+          </div>
+          <figcaption class="caption"><span lang="en">Illustrative data. Same ratios as the dashboard's all-options total.</span><span lang="zh">示意数据，比例与完整看板中全部物流方式的合计一致。</span> <a href="cases/ebay-edd.html#dashboard-shipping"><span lang="en">See the full dashboard →</span><span lang="zh">查看完整看板 →</span></a></figcaption>
+        </figure>
+        <div class="cl-body">
+          <p class="one"><span lang="en">A new model gave orders from Greater China cross-border sellers shorter estimated delivery dates and went live in phases. I designed the monitoring metrics, prepared the data in SQL and built a self-serve dashboard, so the team could keep two questions apart: how many orders the model reached and actually changed, and whether the shorter promises hurt on-time delivery or complaints.</span><span lang="zh">新模型为大中华区跨境卖家的订单给出更短的预计送达时间，分阶段上线。我设计监控指标、用 SQL 准备数据、搭建自助看板，让团队把两件事分开看：模型覆盖并实际改变了多少订单；更短的承诺有没有影响准时送达和投诉。</span></p>
+          <p class="legend"><span class="chip static">Hive SQL</span><span class="chip static">Python (pandas)</span><span class="chip static">Plotly</span><span class="chip static">Streamlit</span></p>
+          <p class="more"><a href="cases/ebay-edd.html"><span lang="en">Read the full case →</span><span lang="zh">阅读完整案例 →</span></a></p>
+        </div>
+      </li>
+      <li class="has-shot" style="--c:var(--hr)">
+        <div class="cl-meta">
+          <p class="eyebrow"><span lang="en">eBay · Trust and risk · Internship</span><span lang="zh">eBay · 交易风险 · 实习项目</span></p>
+          <h3><a href="cases/prci.html"><span lang="en">eBay trust and risk: the high-risk share of Fashion sales rose. What pushed it up?</span><span lang="zh">eBay 交易风险｜高风险成交占比上升，是谁推高的？</span></a></h3>
+        </div>
+        <!-- Preview: the shift-share in three rows, drawn by dash-prci.js from the same illustrative data as the case dashboard. -->
+        <figure class="cl-shot cov-demo prci-demo" data-prci-demo data-mode="net">
+          <div class="cov-top">
+            <p class="cov-title"><span lang="en">High-risk share: a small net rise, with big moves underneath</span><span lang="zh">高风险成交占比：整体只动了一点，底下在拉扯</span></p>
+            <div class="seg" role="group" aria-label="View">
+              <button type="button" data-mode="net" aria-pressed="true"><span lang="en">Net</span><span lang="zh">合计</span></button>
+              <button type="button" data-mode="split" aria-pressed="false"><span lang="en">Rate and mix</span><span lang="zh">拆成两种效应</span></button>
+            </div>
+          </div>
+          <div class="chart"></div>
+          <div class="cov-read" aria-live="polite">
+            <p class="cov-eq" data-eq></p>
+            <p class="cov-def" data-def></p>
+            <ul class="key" data-show="split" hidden>
+              <li><span class="sw" style="--c:var(--rate-eff)"></span><span lang="en">Rate effect: change inside the category</span><span lang="zh">Rate 效应：品类内部占比的变化</span></li>
+              <li><span class="sw" style="--c:var(--mix-eff)"></span><span lang="en">Mix effect: change in the category's weight</span><span lang="zh">Mix 效应：品类权重的变化</span></li>
+            </ul>
+          </div>
+          <figcaption class="caption"><span lang="en">Illustrative data, pp = percentage points. The same numbers as the case dashboard.</span><span lang="zh">示意数据，单位 pp 为百分点；与案例页看板是同一组数字。</span> <a href="cases/prci.html#prci-dashboard-ctv"><span lang="en">See the full dashboard →</span><span lang="zh">查看完整看板 →</span></a></figcaption>
+        </figure>
+        <div class="cl-body">
+          <p class="one"><span lang="en">Fashion's high-risk share of sales turned up at the end of June 2026. I built the data in Spark SQL, sliced it six ways and used a shift-share decomposition to put the change on each category, which pointed to one category, one market and the mid-tier sellers.</span><span lang="zh">2026 年 6 月底，Fashion 的高风险成交占比往上走。我用 Spark SQL 搭数据，按六个维度切分，再用 Shift-Share 把变化落到每个品类，定位到一个主要品类、一个市场和一群中腰部卖家。</span></p>
+          <p class="legend"><span class="chip static">Spark SQL</span><span class="chip static">Python (pandas)</span><span class="chip static">Plotly</span><span class="chip static">Streamlit</span></p>
+          <p class="more"><a href="cases/prci.html"><span lang="en">Read the full case →</span><span lang="zh">阅读完整案例 →</span></a></p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <footer>
+    <span>2026</span>
+    <span><span lang="en">Plain HTML and CSS; no tracking. Charts in the cases use illustrative data.</span><span lang="zh">纯 HTML 和 CSS，不加统计代码。案例中的图表均为示意数据。</span></span>
+  </footer>
+</main>
+
+<script src="kit.js"></script>
+<script>Kit.initToggles();</script>
+<script src="site.js"></script>
+<script src="dash-prci.js"></script>
+</body>
+</html>

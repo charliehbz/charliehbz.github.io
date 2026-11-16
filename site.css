@@ -1,0 +1,134 @@
+/* site.css · additions for this portfolio, loaded after kit.css.
+   Tokens only (no #hex outside :root); sizes and gaps from DESIGN.md scales.
+   Class names carry their own prefixes so they cannot clash with kit.css. */
+
+/* 0. Dashboard colours. Each one means a single thing everywhere on the site (home preview, case figure, dashboard). */
+:root {
+  --adopt: var(--navy);                                             /* orders that used the model's date */
+  --elig: color-mix(in srgb, var(--navy) 32%, var(--paper));        /* eligible, kept the rule's date (fills) */
+  --elig-line: color-mix(in srgb, var(--navy) 52%, var(--paper));   /* the same group as a line */
+  --uncov: color-mix(in srgb, var(--stone) 30%, var(--paper));      /* not covered by the model (fills) */
+  --uncov-line: var(--stone);                                       /* the same group as a line */
+  --y2024: var(--olive); --y2025: var(--plum); --y2026: var(--ochre);   /* one colour per year in the GMV tab */
+  /* PRCI case */
+  --hr: var(--rose);                 /* high-risk sellers, and shares that belong to them */
+  --nonhr: var(--stone);             /* other sellers; "before" baselines */
+  --rate-eff: var(--clay);           /* rate effect: change inside a category */
+  --mix-eff: var(--sky);             /* mix effect: change in a category's weight */
+}
+
+/* A. Breadcrumb on case pages ----------------------------------------------------------------- */
+.crumbs { display: flex; flex-wrap: wrap; gap: 4px 8px; padding-top: 16px; font-size: 13px; color: var(--muted); }
+.crumbs a { color: var(--muted); }
+.crumbs a:hover { color: var(--ink); }
+
+/* B. Case list on the home page: one row per case, each links to its own page ------------------- */
+.case-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 28px; }
+.case-list > li { border-top: 2px solid var(--c, var(--ink)); padding-top: 16px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 10px 28px; align-items: start; }
+.case-list h3 { font-family: var(--serif); font-size: 22px; font-weight: 700; line-height: 1.25; margin-top: 6px; text-wrap: balance; }
+.case-list h3 a { color: var(--ink); text-decoration: none; }
+.case-list h3 a:hover { text-decoration: underline; }
+.case-list .one { font-size: 15px; color: var(--muted); }
+.case-list .legend { margin-top: 12px; }
+.case-list .more { margin-top: 12px; font-size: 14px; font-weight: 600; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+:root[data-lang="zh"] .case-list h3 { font-family: var(--cjk); }
+.case-list > li.has-shot { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: "meta shot" "body shot"; grid-template-rows: auto 1fr; }
+.has-shot .cl-meta { grid-area: meta; }
+.has-shot .cl-body { grid-area: body; }
+.has-shot .cl-shot { grid-area: shot; }
+
+/* C. Long-form case page ---------------------------------------------------------------------- */
+.prose { display: flex; flex-direction: column; gap: 12px; max-width: 80ch; }
+.prose ul { display: flex; flex-direction: column; gap: 6px; }
+.col { display: flex; flex-direction: column; gap: 10px; }
+.col ul { display: flex; flex-direction: column; gap: 6px; }
+.facts.wide { max-width: 96ch; }
+
+/* D. Coverage vs adoption bars on the case page (same colours as the dashboard) ------------------ */
+.rf { margin: 0; display: flex; flex-direction: column; gap: 18px; }
+.rf-title { font-size: 14px; font-weight: 600; }
+.rf-row { display: flex; flex-direction: column; gap: 6px; }
+.rf-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.rf-name { font-size: 14px; font-weight: 600; }
+.rf-eq { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.rf-bar { display: flex; height: 30px; }
+.rf-seg { display: flex; align-items: center; min-width: 0; padding-inline: 8px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.rf-seg + .rf-seg { border-left: 2px solid var(--paper); }
+.s-adopt { background: var(--adopt); color: var(--paper); }
+.s-elig { background: var(--elig); color: var(--ink); }
+.s-out { background: var(--uncov); color: var(--ink); }
+.rf-note { font-size: 12.5px; color: var(--muted); }
+.rf-key { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--muted); }
+.rf-key li { display: flex; align-items: center; gap: 6px; }
+.rf-key .sw { width: 12px; height: 12px; border-radius: 4px; flex: none; }
+
+/* E. Home preview: 100 orders as dots; the toggle swaps which dots are numerator and denominator -- */
+.cov-demo { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+.cov-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.cov-title { font-size: 14px; font-weight: 600; }
+.cov-body { display: grid; grid-template-columns: minmax(0, 250px) minmax(0, 1fr); gap: 18px 28px; align-items: center; }
+.cov-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; }
+.cov-grid .d { display: block; aspect-ratio: 1; border-radius: 50%; border: 1.5px solid transparent; transition: background-color 160ms, border-color 160ms, opacity 160ms; }
+.cov-grid .d.a { background: var(--adopt); }
+.cov-grid .d.e { background: var(--elig); }
+.cov-grid .d.u { background: var(--uncov); }
+.cov-demo[data-mode="adopt"] .cov-grid .d.u { background: transparent; border: 1.5px dashed var(--uncov-line); opacity: 0.8; }
+.cov-read { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.cov-name { font-size: 13px; font-weight: 600; color: var(--muted); }
+.cov-eq { font-family: var(--serif); font-size: 28px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.cov-eq .num { color: var(--adopt); }
+.cov-def { font-size: 14px; color: var(--muted); }
+.cov-demo:not([data-mode="adopt"]) [data-show="adopt"], .cov-demo[data-mode="adopt"] [data-show="cov"] { display: none; }
+.key { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--muted); }
+.key li { display: inline-flex; align-items: center; gap: 6px; }
+.key .sw { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--c); }
+.key .sw.hollow { background: transparent; border: 1.5px dashed var(--uncov-line); }
+
+/* F. Case page: the web version of the dashboard ---------------------------------------------- */
+.dash { display: flex; flex-direction: column; gap: 16px; }
+[data-dash] [role="tab"] { scroll-margin-top: 210px; }   /* a link to a tab lands with the section heading and tabs in view */
+.dash .table-wrap { margin-top: 4px; }
+.prci-demo .cov-eq { font-size: 22px; }
+.chip-pick { display: flex; flex-wrap: wrap; gap: 6px; }
+.dash-panel { display: flex; flex-direction: column; }
+.dash-block { display: flex; flex-direction: column; gap: 12px; padding-block: 18px 22px; border-top: 1px solid var(--rule); min-width: 0; }
+.dash-panel > .dash-block:first-child { border-top: 0; padding-top: 6px; }
+.dash-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.dash-h { font-size: 16px; font-weight: 600; }
+.dash-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13px; color: var(--muted); }
+.dash-grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 28px; }
+.dash-grid2 > .dash-block { border-top: 1px solid var(--rule); }
+.defs.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.stats.five { grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 0; }
+.stats.five .big { font-size: 28px; }
+.eqs { display: flex; flex-wrap: wrap; gap: 6px 28px; }
+.eq { display: flex; flex-direction: column; gap: 2px; }
+.eq .k { font-size: 13px; font-weight: 600; color: var(--muted); }
+.eq .v { font-size: 16px; font-variant-numeric: tabular-nums; }
+.eq .v b { font-weight: 700; }
+.edd { display: grid; grid-template-columns: max-content minmax(0, 1fr) minmax(0, 1fr) max-content; gap: 10px 14px; align-items: center; font-size: 13.5px; }
+.edd .hd { font-size: 12px; font-weight: 600; color: var(--muted); }
+.edd .lab { display: inline-flex; align-items: center; gap: 6px; }
+.edd .lab .sw { width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex: none; }
+.edd .bar { display: flex; align-items: center; gap: 6px; min-width: 0; font-variant-numeric: tabular-nums; }
+.edd .bar i { display: block; height: 14px; border-radius: 2px; background: var(--c); }
+.edd .tot { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.dash .m-title { font-size: 13px; font-weight: 600; }
+
+/* G. Responsive ------------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .case-list > li { grid-template-columns: minmax(0, 1fr); }
+  .case-list > li.has-shot { grid-template-columns: minmax(0, 1fr); grid-template-areas: "meta" "shot" "body"; grid-template-rows: none; }
+  .dash-grid2 { grid-template-columns: minmax(0, 1fr); }
+  .defs.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats.five { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  /* long metric labels ("Item-not-received rate · guardrail") would squeeze the text column: put the label above */
+  .facts.wide { grid-template-columns: minmax(0, 1fr); gap: 2px 0; }
+  .facts.wide dd { margin-bottom: 12px; }
+  .cov-body { grid-template-columns: minmax(0, 1fr); }
+  .cov-grid { max-width: 260px; }
+  .defs.four { grid-template-columns: minmax(0, 1fr); }
+  .edd { gap: 8px 8px; font-size: 13px; }
+}
