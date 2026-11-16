@@ -1,4 +1,4 @@
-/* dash-edd.js · the web version of the EDD rollout dashboard on cases/ebay-edd.html (loaded after kit.js and site.js).
+/* dash-edd.js · the web version of the EDD rollout dashboard in the EDD project of index.html (loaded after kit.js and site.js).
    Rebuilt from the dashboard delivered during the internship, keeping its analysis: GMV tab (windows → before/after →
    trends by year) and Shipping tab (coverage and adoption → promised days → on-time delivery and tracking → complaints).
    Every number comes from ONE seeded set of illustrative data generated below, so KPIs, formulas, charts, the guided

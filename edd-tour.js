@@ -1,4 +1,4 @@
-/* edd-tour.js · the two-minute guided demo on cases/ebay-edd.html: "should this route get a wider rollout?"
+/* edd-tour.js · the two-minute guided demo in the EDD project of index.html: "should this route get a wider rollout?"
    Three steps inside the Shipping tab, each one: look at a chart → see one thing → answer one question. Every number is
    read from window.EDD (dash-edd.js) for the demo's scope, the same figures the charts draw, so the text and the
    charts cannot disagree. If the reader changes a filter mid-demo, the card says so and offers to restore the scope. */

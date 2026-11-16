@@ -1,4 +1,4 @@
-/* prci-review.js · "Can this risk recommendation go to the strategy team?" on cases/prci.html.
+/* prci-review.js · "Can this risk recommendation go to the strategy team?" in the PRCI project of index.html.
    A portfolio extension designed after the internship: a hand-built draft (not model output) is reviewed sentence by
    sentence — keep, rewrite, or needs more data — and each judgement links to the evidence in the dashboard below.
    The judgements are preset; no model is called. Every number is read from window.PRCI (dash-prci.js), the same

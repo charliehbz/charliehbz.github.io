@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>求职作品集 · 数据分析、商业分析、供应链与 AI 产品运营</title>
-<meta name="description" content="数据分析、商业分析、供应链管理和 AI 产品运营方向的求职作品集。第一个案例：eBay 跨境物流预计送达时间模型的上线监控。">
+<meta name="description" content="求职作品集：两个 eBay 实习项目。EDD：预计送达时间模型上线监控，附两分钟看板演示和 AI 简报原型；PRCI：高风险成交占比异动的贡献分解，附 AI 风控建议审核演示。">
 <meta property="og:title" content="求职作品集 · 数据分析、商业分析、供应链与 AI 产品运营">
-<meta property="og:description" content="案例：eBay 跨境物流｜更短的预计送达时间，能否兑现？">
+<meta property="og:description" content="EDD · 物流模型上线监控；PRCI · 交易风险归因。两个案例都可以直接在页面里交互。">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,20 +15,24 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap"></noscript>
 <link rel="stylesheet" href="kit.css">
 <link rel="stylesheet" href="site.css">
+<script>
+  // Pick the project before the first paint, so /#prci never flashes the EDD case first (site.js keeps it in sync).
+  (function () { var h = location.hash.slice(1); document.documentElement.setAttribute('data-proj', /^(prci|review|rv-|p-)/.test(h) ? 'prci' : 'edd'); })();
+</script>
 <!--
-  首页。每段可见文字都是一对：<span lang="en">…</span><span lang="zh">…</span>，改的时候两半都改。
-  加新案例：复制 .case-list 里的整个 <li>，改颜色（--c）、文字和链接；案例页复制 cases/ebay-edd.html 再改。
-  姓名、学校、联系方式之后补在 masthead 里（模板的 .links 和 .stats 写法见 personal-site-design/template）。
+  作品集首页 = 唯一的公开入口。两个项目在同一页，用顶部的项目 Tab 切换（site.js），地址 /#edd、/#prci。
+  每个项目的全部内容只在这一个文件里：搜「项目一：EDD」「项目二：PRCI」。图表和交互在各自的脚本里：
+    EDD：dash-edd.js（看板）、edd-tour.js（两分钟演示）、edd-brief.js + brief-data.js（AI 简报原型）
+    PRCI：dash-prci.js（五页看板）、prci-review.js（AI 建议审核演示）
+  cases/ebay-edd.html 和 cases/prci.html 只是兼容旧链接的跳转页。每段可见文字都是 en / zh 一对，两半都要改。
 -->
 </head>
 <body>
 
 <header class="topbar">
   <div class="wrap">
-    <a class="who" href="index.html"><span lang="en">Portfolio</span><span lang="zh">求职作品集</span></a>
-    <nav class="pages" aria-label="Sections">
-      <a href="#projects"><span lang="en">Projects</span><span lang="zh">项目</span></a>
-    </nav>
+    <span class="who"><span lang="en">Portfolio</span><span lang="zh">求职作品集</span></span>
+    <span class="who-sub"><span lang="en">Data analytics · Business analytics · Supply chain · AI product operations</span><span lang="zh">数据分析 · 商业分析 · 供应链管理 · AI 产品运营</span></span>
     <div class="toggles">
       <div class="seg" role="group" aria-label="Language">
         <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
@@ -43,103 +47,677 @@
   </div>
 </header>
 
+<!-- Project tabs: switch the whole project. The small pill tabs inside each case switch dashboard pages. -->
+<nav class="proj-nav" aria-label="Projects">
+  <div class="wrap">
+    <a class="proj-tab" href="#edd" data-proj="edd" aria-current="page"><span class="pt-k">EDD</span><span class="pt-dot" aria-hidden="true">·</span><span class="pt-n"><span lang="en">Delivery-date model rollout monitoring</span><span lang="zh">物流模型上线监控</span></span></a>
+    <a class="proj-tab" href="#prci" data-proj="prci"><span class="pt-k">PRCI</span><span class="pt-dot" aria-hidden="true">·</span><span class="pt-n"><span lang="en">Trust-risk attribution</span><span lang="zh">交易风险归因</span></span></a>
+  </div>
+</nav>
+
 <main class="wrap" id="top">
 
-  <div class="masthead">
-    <p class="eyebrow"><span lang="en">Data analytics · Business analytics · Supply chain management · AI product operations</span><span lang="zh">数据分析 · 商业分析 · 供应链管理 · AI 产品运营</span></p>
-    <h1><span lang="en">Turning a business question into metrics a team can track, and a tool it can check on its own</span><span lang="zh">把业务问题拆成能追踪的指标，再做成团队自己能查的工具</span></h1>
-    <p class="lede"><span lang="en">Looking for roles in data analytics, business analytics, supply chain management and AI product operations. During my internship with eBay's Shipping &amp; Trust analytics team, I designed the monitoring metrics for a delivery-date model that went live in phases, prepared the data in SQL and built a dashboard the team could use on its own; I also broke down a rise in Fashion's high-risk share of sales.</span><span lang="zh">正在找数据分析、商业分析、供应链管理和 AI 产品运营方向的岗位。在 eBay 物流与交易信任（Shipping &amp; Trust）分析团队实习时，我为一个分阶段上线的预计送达时间模型设计了监控指标，用 SQL 准备数据，并搭建了团队可以自助使用的看板；也拆解过 Fashion 高风险成交占比的一次异动。</span></p>
-  </div>
-
-  <section class="block" id="projects">
-    <div class="head">
-      <p class="eyebrow"><span lang="en">Projects</span><span lang="zh">项目</span></p>
-      <h2><span lang="en">Each case says what I owned and where the evidence stops</span><span lang="zh">写清我负责的部分，也写清证据的边界</span></h2>
+  <!-- ======================================================================== 项目一：EDD（到「项目一结束」为止） -->
+  <section class="project" id="project-edd" data-project="edd" data-title-en="EDD · Delivery-date model rollout monitoring · Portfolio" data-title-zh="EDD · 物流模型上线监控 · 求职作品集">
+    <div class="masthead">
+      <p class="eyebrow"><span lang="en">eBay · Cross-border shipping · Internship project</span><span lang="zh">eBay · 跨境物流 · 实习项目</span></p>
+      <h1><span lang="en">eBay cross-border shipping: shorter delivery promises, but can they be kept?</span><span lang="zh">eBay 跨境物流｜更短的预计送达时间，能否兑现？</span></h1>
+      <p class="lede"><span lang="en">During my eBay internship I owned the monitoring of a delivery-date model's phased rollout: I set the metrics, prepared the data in SQL and built a dashboard the team uses on its own.</span><span lang="zh">在 eBay 实习时，我负责一个预计送达时间模型分阶段上线后的监控：定指标、用 SQL 准备数据、搭建团队自助看板。</span></p>
+      <div class="tour-cta" id="demo">
+        <a class="tour-go" href="#dashboard-shipping" data-tour-start><span lang="en">Decide with me: should this route get a wider rollout?</span><span lang="zh">跟我判断一次：这条线路值得扩大上线吗？</span><span class="arr" aria-hidden="true">→</span></a>
+        <p class="note"><span lang="en">About 2 minutes · 3 steps in the dashboard below · illustrative data. Or jump to the <a href="#ai-brief">AI rollout-brief prototype</a> (a portfolio extension).</span><span lang="zh">约 2 分钟 · 在下方看板里走 3 步 · 示意数据。也可以直接看 <a href="#ai-brief">AI 上线简报原型</a>（作品集扩展）。</span></p>
+      </div>
+      <p class="lede-sm"><span lang="en">The estimated delivery date (EDD) is the delivery date a buyer sees when placing an order. For orders within the model's scope the system works out two dates, one from the old rules and one from the model; the model's date replaces the rule's only when it is shorter. Monitoring has to answer how often the model's date is really used, and whether the shorter promises are kept.</span><span lang="zh">预计送达时间（EDD）是买家下单时看到的预计送达时间。对模型使用范围内的订单，系统同时算出原规则和模型两个时间，模型给出的时间更短时才会替换。上线监控要回答：模型真正用上了多少，更短的承诺能不能兑现。</span></p>
     </div>
 
-    <!-- 一个 <li> 一个案例。--c 是这类工作的颜色：物流配送 slate；数据与工具 sky；电商运营 navy（见 DESIGN.md） -->
-    <ol class="case-list">
-      <li class="has-shot" style="--c:var(--slate)">
-        <div class="cl-meta">
-          <p class="eyebrow"><span lang="en">eBay · Cross-border shipping · Internship</span><span lang="zh">eBay · 跨境物流 · 实习项目</span></p>
-          <h3><a href="cases/ebay-edd.html"><span lang="en">eBay cross-border shipping: shorter delivery promises, but can they be kept?</span><span lang="zh">eBay 跨境物流｜更短的预计送达时间，能否兑现？</span></a></h3>
+    <!-- 1. The dashboard, rebuilt for the web, with the guided demo inside the Shipping tab. Same analysis as the one
+         delivered (two tabs), drawn with the site's own components from one set of illustrative data (../dash-edd.js). -->
+    <section class="block" id="dashboard">
+      <div class="head dash-head">
+        <div>
+          <p class="eyebrow"><span lang="en">The dashboard</span><span lang="zh">看板</span></p>
+          <h2><span lang="en">The same dashboard, rebuilt as part of this page</span><span lang="zh">按原看板的分析逻辑，重做成网页里的看板</span></h2>
+          <p class="dek"><span lang="en">Rebuilt from the dashboard I delivered during the internship; the data shown is illustrative.</span><span lang="zh">根据实习期间实际交付的看板重制，展示数据为示意。</span></p>
         </div>
-        <!-- Preview: 100 orders as dots. The toggle (site.js) swaps the numerator and denominator; CSS does the rest. Illustrative numbers. -->
-        <figure class="cl-shot cov-demo" data-cov-demo data-mode="cov">
-          <div class="cov-top">
-            <p class="cov-title"><span lang="en">Coverage and adoption, on 100 orders</span><span lang="zh">覆盖与采用：同样 100 个订单，两个分母</span></p>
-            <div class="seg" role="group" aria-label="Metric">
-              <button type="button" data-mode="cov" aria-pressed="true"><span lang="en">Model coverage</span><span lang="zh">模型覆盖</span></button>
-              <button type="button" data-mode="adopt" aria-pressed="false"><span lang="en">Actual adoption</span><span lang="zh">实际采用</span></button>
+        <a class="brief-entry" href="#ai-brief">
+          <span class="be-t"><span lang="en">Draft this week's rollout brief with AI ↓</span><span lang="zh">用 AI 起草本周上线简报 ↓</span></span>
+          <span class="be-s"><span lang="en">Personal portfolio extension · illustrative data</span><span lang="zh">个人作品集扩展 · 使用示意数据</span></span>
+        </a>
+      </div>
+
+      <div class="dash" data-dash data-edd-dash>
+        <div class="case-tabs" role="tablist" aria-label="Dashboard tabs">
+          <button type="button" role="tab" id="dashboard-gmv" aria-controls="dpanel-gmv" aria-selected="true"><span lang="en">GMV Performance</span><span lang="zh">GMV Performance · 商业表现</span></button>
+          <button type="button" role="tab" id="dashboard-shipping" aria-controls="dpanel-shipping" aria-selected="false" tabindex="-1"><span lang="en">Shipping Performance</span><span lang="zh">Shipping Performance · 物流表现</span></button>
+        </div>
+        <noscript><p class="note">The charts need JavaScript. 看板图表需要启用 JavaScript。</p></noscript>
+
+        <!-- GMV tab: windows → before / after → trends by year -->
+        <div class="dash-panel" id="dpanel-gmv" role="tabpanel" aria-labelledby="dashboard-gmv">
+          <div class="dash-block">
+            <h3 class="dash-h"><span lang="en">Base and exit windows</span><span lang="zh">基期与观察期</span></h3>
+            <dl class="defs four">
+              <div><dt><span lang="en">Base window</span><span lang="zh">基期</span></dt><dd><span lang="en">2026 weeks 1–4 (Jan 4–31)</span><span lang="zh">2026 年第 1–4 周（1/4–1/31）</span></dd></div>
+              <div><dt><span lang="en">Exit window</span><span lang="zh">观察期</span></dt><dd><span lang="en">2026 weeks 25–28 (Jun 21–Jul 18)</span><span lang="zh">2026 年第 25–28 周（6/21–7/18）</span></dd></div>
+              <div><dt><span lang="en">Seasonal baseline</span><span lang="zh">季节基线</span></dt><dd><span lang="en">The same weeks in 2024 and 2025</span><span lang="zh">2024、2025 年的同一批周次</span></dd></div>
+              <div><dt><span lang="en">Selected sellers</span><span lang="zh">选定卖家</span></dt><dd><span lang="en">Greater China sellers picked by the filters</span><span lang="zh">大中华区卖家中按筛选条件选出的一组</span></dd></div>
+            </dl>
+            <p class="def"><span lang="en">Sales rise and fall with demand and the season, so they are first turned into a share of total demand, indexed to the base window (= 100) and compared with the same weeks in past years. This page is descriptive: it shows whether the share left its usual path, not that the model added sales. The data holds completed orders only.</span><span lang="zh">成交额会随市场需求和季节起伏，所以先换算成占市场需求的份额，以基期为 100 换算成指数，再和往年同期比较。这一页是描述性分析：能看出份额是否偏离往年走势，不能证明模型带来了成交增量；数据里也只有已成交的订单。</span></p>
+          </div>
+
+          <div class="dash-block" id="blk-gmv-kpi">
+            <h3 class="dash-h"><span lang="en">Before and after, then against the season</span><span lang="zh">前后窗口对比，再扣除季节</span></h3>
+            <div class="stats five" id="gmv-kpis"></div>
+            <div class="split">
+              <div class="chart" id="gmv-db"></div>
+              <p class="caption" id="gmv-db-cap"></p>
             </div>
           </div>
-          <div class="cov-body">
-            <div class="cov-grid" role="img" aria-label="100 个订单：20 个实际采用模型，60 个符合条件但未采用，20 个未覆盖 / 100 orders: 20 used the model, 60 eligible but not used, 20 not covered"><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d a"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d e"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i><i class="d u"></i></div>
-            <div class="cov-read" aria-live="polite">
-              <p class="cov-name" data-show="cov"><span lang="en">Coverage</span><span lang="zh">覆盖率</span></p>
-              <p class="cov-name" data-show="adopt"><span lang="en">Adoption among eligible orders</span><span lang="zh">符合条件订单中的采用率</span></p>
-              <p class="cov-eq" data-show="cov"><span class="num">80</span> / 100 = 80%</p>
-              <p class="cov-eq" data-show="adopt"><span class="num">20</span> / 80 = 25%</p>
-              <p class="cov-def" data-show="cov"><span lang="en">Numerator: the 80 orders that meet the model's conditions (dark and light blue). Denominator: all 100 orders.</span><span lang="zh">分子：符合模型使用条件的 80 个订单（深蓝加浅蓝）。分母：全部 100 个订单。</span></p>
-              <p class="cov-def" data-show="adopt"><span lang="en">Numerator: the 20 orders that used the model's date (dark blue). The denominator shrinks to the 80 eligible orders; the 20 grey ones drop out.</span><span lang="zh">分子：实际采用模型时间的 20 个订单（深蓝）。分母缩小到符合条件的 80 个，灰色的 20 个不再计入。</span></p>
+
+          <div class="dash-block">
+            <div class="dash-bar">
+              <h3 class="dash-h"><span lang="en">GMV and share of demand, by year</span><span lang="zh">历年 GMV 与市场份额</span></h3>
+              <div class="seg" role="group" aria-label="Scale" id="gmv-mode">
+                <button type="button" data-v="raw" aria-pressed="true"><span lang="en">Raw values</span><span lang="zh">原始值</span></button>
+                <button type="button" data-v="idx" aria-pressed="false"><span lang="en">Base-window index</span><span lang="zh">基期指数</span></button>
+              </div>
+            </div>
+            <ul class="key">
+              <li><span class="sw" style="--c:var(--y2024)"></span>2024</li>
+              <li><span class="sw" style="--c:var(--y2025)"></span>2025</li>
+              <li><span class="sw" style="--c:var(--y2026)"></span><span lang="en">2026 (rollout year)</span><span lang="zh">2026（上线年）</span></li>
+              <li><span lang="en">Shaded: base and exit windows</span><span lang="zh">阴影：基期与观察期</span></li>
+            </ul>
+            <div class="multiples">
+              <div><p class="m-title" id="gmv-t1-title"></p><div class="chart" id="gmv-t1"></div></div>
+              <div><p class="m-title" id="gmv-t2-title"></p><div class="chart" id="gmv-t2"></div></div>
+              <div><p class="m-title" id="gmv-t3-title"></p><div class="chart" id="gmv-t3"></div></div>
+            </div>
+            <p class="caption" id="gmv-read"></p>
+          </div>
+        </div>
+
+        <!-- Shipping tab: the option and window selectors drive every chart below; the demo card (#tour) is moved next
+             to the chart each step is about -->
+        <div class="dash-panel" id="dpanel-shipping" role="tabpanel" aria-labelledby="dashboard-shipping">
+          <div class="dash-block">
+            <div class="dash-bar">
+              <div class="dash-ctl"><span lang="en">Shipping option</span><span lang="zh">物流方式</span>
+                <div class="seg" role="group" aria-label="Shipping option" id="ship-opt">
+                  <button type="button" data-v="all" aria-pressed="true"><span lang="en">All</span><span lang="zh">全部</span></button>
+                  <button type="button" data-v="speedpak" aria-pressed="false">SpeedPAK</button>
+                  <button type="button" data-v="economy" aria-pressed="false">Economy</button>
+                  <button type="button" data-v="express" aria-pressed="false">Express</button>
+                  <button type="button" data-v="standard" aria-pressed="false">Standard</button>
+                </div>
+              </div>
+              <div class="dash-ctl"><span lang="en">Window</span><span lang="zh">时间窗口</span>
+                <div class="seg" role="group" aria-label="Window" id="ship-win">
+                  <button type="button" data-v="all" aria-pressed="true"><span lang="en">All 25 weeks</span><span lang="zh">全部 25 周</span></button>
+                  <button type="button" data-v="w18" aria-pressed="false">W18–W21</button>
+                  <button type="button" data-v="w22" aria-pressed="false"><span lang="en">W22–W25 · latest</span><span lang="zh">W22–W25 · 最近 4 周</span></button>
+                </div>
+              </div>
+            </div>
+            <ul class="key">
+              <li><span class="sw" style="--c:var(--adopt)"></span><span lang="en">Used the model</span><span lang="zh">实际采用模型</span></li>
+              <li><span class="sw" style="--c:var(--elig)"></span><span lang="en">Eligible, not used</span><span lang="zh">符合条件但未采用</span></li>
+              <li><span class="sw" style="--c:var(--uncov)"></span><span lang="en">Not covered</span><span lang="zh">未覆盖</span></li>
+            </ul>
+            <p class="note" id="ship-scope"></p>
+          </div>
+
+          <aside class="tour" id="tour" hidden aria-live="polite"></aside>
+
+          <div class="dash-block" id="blk-cov">
+            <div class="dash-bar">
+              <h3 class="dash-h"><span lang="en">Coverage and adoption</span><span lang="zh">覆盖与采用</span></h3>
+              <div class="dash-ctl"><span lang="en">Count by</span><span lang="zh">口径</span>
+                <div class="seg" role="group" aria-label="Count by" id="ship-basis">
+                  <button type="button" data-v="n" aria-pressed="true"><span lang="en">Orders</span><span lang="zh">订单数</span></button>
+                  <button type="button" data-v="g" aria-pressed="false"><span lang="en">Sales (GMV)</span><span lang="zh">成交额</span></button>
+                </div>
+              </div>
+            </div>
+            <p class="def"><span lang="en">Coverage is out of all orders; adoption only out of eligible orders. With all orders underneath, adoption would rise whenever coverage grew, and you could not tell "used more" from "reached more". Low adoption is not proof the model failed: where the rule already promises short, the model has nothing shorter to offer.</span><span lang="zh">覆盖率的分母是全部订单，采用率的分母只是符合条件的订单。如果采用率也用全部订单作分母，覆盖一扩大它就跟着涨，分不清是"用得更多"还是"覆盖更广"。采用率低也不等于模型没起作用：原规则的承诺本来就短时，模型给不出更短的时间。</span></p>
+            <div class="eqs" id="ship-eqs"></div>
+            <div class="chart" id="ship-cov"></div>
+            <p class="caption"><span lang="en">Each bar is one week of orders, split into the three groups. The top of the light blue is coverage; dark blue over dark plus light blue is adoption. Hover a week for both rates.</span><span lang="zh">每根柱子是一周的订单，分成三组。浅蓝的上沿就是覆盖率；深蓝占「深蓝加浅蓝」的比例是采用率。鼠标停在某一周可以看到两个比例。</span></p>
+            <details class="why">
+              <summary><span lang="en">Design detail: why a filter would make coverage read 100% by mistake</span><span lang="zh">设计细节：为什么筛选后覆盖率会错误地变成 100%</span></summary>
+              <p><span lang="en">The delivered dashboard has a global filter for model eligibility. Apply it first and coverage always comes out at 100%, because the denominator has already been cut down to eligible orders. So this block reads its own copy of the data and ignores that filter. Since then I write a metric's denominator down first and check which filters could change it.</span><span lang="zh">交付的看板有一个全局筛选"是否符合模型条件"。如果先筛出符合条件的订单再算覆盖率，分母已经被砍成了符合条件的订单，结果永远是 100%。所以这一块单独取数，不受这个筛选影响。从那以后，我设计指标时会先写清分母，再检查哪些筛选会改动它。</span></p>
+            </details>
+          </div>
+
+          <div class="dash-block" id="blk-edd">
+            <h3 class="dash-h"><span lang="en">Promised handling and transit time</span><span lang="zh">预计处理与运输时间</span></h3>
+            <p class="def"><span lang="en">Main metric. The business days the buyer is promised, split into seller handling and transit. Each is total days ÷ orders, so every order counts once and the split shows which stage got shorter.</span><span lang="zh">主指标。买家看到的承诺工作日，拆成卖家处理和运输两段；每段都是"总天数 ÷ 订单数"，每笔订单权重相同，拆开后能看出缩短发生在哪一段。</span></p>
+            <div class="split">
+              <div class="edd" id="ship-edd"></div>
+              <div><p class="m-title"><span lang="en">Promised delivery days, by week</span><span lang="zh">每周的预计送达天数</span></p><div class="chart" id="ship-edd-line"></div></div>
+            </div>
+            <p class="caption" id="ship-edd-cap"></p>
+          </div>
+
+          <div class="dash-grid2">
+            <div class="dash-block" id="blk-ot">
+              <h3 class="dash-h"><span lang="en">On-time delivery</span><span lang="zh">实际准时送达率</span></h3>
+              <p class="def"><span lang="en">Guardrail. Orders whose delivery scan came before the promised date ÷ orders with a delivery scan. The acceptance scan is checked too, for seller handling.</span><span lang="zh">护栏。签收扫描早于预计送达时间的订单 ÷ 有签收扫描的订单。另看揽收扫描是否准时，检查卖家处理环节。</span></p>
+              <div class="chart" id="ship-ot"></div>
+              <p class="caption" id="ship-ot-cap"></p>
+            </div>
+            <div class="dash-block" id="blk-trk">
+              <h3 class="dash-h"><span lang="en">Tracking coverage</span><span lang="zh">追踪覆盖率</span></h3>
+              <p class="def"><span lang="en">Orders with tracking scans ÷ all orders. On-time can only be measured on these orders, so when this line drops, a change in on-time may only mean fewer orders were measured.</span><span lang="zh">有物流跟踪记录的订单 ÷ 全部订单。准时率只能算在有跟踪记录的订单上；这条线下降时，准时率的变化可能只是因为被测的订单变少了。</span></p>
+              <div class="chart" id="ship-trk"></div>
+              <p class="caption" id="ship-trk-cap"></p>
+            </div>
+          </div>
+
+          <div class="dash-block" id="blk-inr">
+            <h3 class="dash-h"><span lang="en">Item-not-received rate (30 days)</span><span lang="zh">未收到货投诉率（30 天）</span></h3>
+            <p class="def"><span lang="en">Guardrail. Orders with an item-not-received (INR) claim within 30 days ÷ orders. Claims take time to arrive, so each week is flagged once it has a full 30 days behind it, and weeks that are not mature are left out.</span><span lang="zh">护栏。30 天内发起"未收到货"投诉（INR，Item Not Received）的订单 ÷ 订单数。投诉要过一段时间才会到齐，所以每周都标了是否已满 30 天，未满的周不计入。</span></p>
+            <div class="chart" id="ship-inr"></div>
+            <p class="caption" id="ship-inr-cap"></p>
+          </div>
+
+          <div class="dash-block dash-read" id="blk-read">
+            <p><span lang="en"><b>How to read the four together.</b> Fewer promised days with on-time delivery flat or higher means the model found slack the rules had left; a clear drop in on-time delivery means promises were cut too far. A flat complaint rate fits the goal; claiming fewer complaints would need a drop on comparable orders. The used and not-used groups are observed, not randomly assigned, so differences between them diagnose shipping performance and are not read as the model's effect.</span><span lang="zh"><b>四张图怎么连起来读。</b>承诺天数下降、准时送达率持平或上升，说明模型找到了原规则多留的余量；准时率明显下降，说明承诺压得过短。投诉率持平与上线目标相容；要说投诉体验改善，需要在可比订单上看到投诉下降。采用与未采用两组不是随机分出来的，组间差异只用来诊断物流表现，不当作模型的效果。</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. The AI brief prototype: a portfolio extension built after the internship, reading the dashboard's
+         illustrative data. Example mode on this static site; set data-endpoint to a server function for live drafts. -->
+    <section class="block" id="ai-brief" data-endpoint="">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">Portfolio extension · illustrative data</span><span lang="zh">个人作品集扩展 · 使用示意数据</span></p>
+        <h2><span lang="en">Drafting this week's rollout brief with AI</span><span lang="zh">用 AI 起草本周上线简报</span></h2>
+        <p class="dek"><span lang="en">Pick a shipping option and a 4-week window. The program works out every number; a language model turns them into a short brief that answers three questions, and every point links back to its chart.</span><span lang="zh">选好物流方式和 4 周时间窗口。程序先算好所有数字，再由语言模型写成回答三个问题的短简报；每条要点都能点回对应的图。</span></p>
+      </div>
+
+      <dl class="own">
+        <div><dt><span lang="en">Delivered at eBay, during the internship</span><span lang="zh">eBay 实习期间交付</span></dt><dd><span lang="en">The rollout-monitoring dashboard: metrics, SQL data preparation, pandas, Plotly and Streamlit. The web dashboard above is rebuilt from it.</span><span lang="zh">上线监控看板：指标设计、SQL 取数、pandas 计算、Plotly 和 Streamlit 看板。上面的网页看板按它重制。</span></dd></div>
+        <div><dt><span lang="en">Built afterwards for this portfolio, November 2026</span><span lang="zh">实习结束后为作品集开发，2026 年 11 月</span></dt><dd><span lang="en">This brief prototype. It reads the illustrative data on this page, is not connected to any eBay system and was never used at eBay.</span><span lang="zh">这个简报原型。它读取本页的示意数据，不连接 eBay 的任何系统，也没有在 eBay 使用过。</span></dd></div>
+      </dl>
+
+      <div class="brief" id="brief">
+        <div class="brief-ctl">
+          <div class="dash-ctl"><span lang="en">Shipping option</span><span lang="zh">物流方式</span>
+            <div class="seg" role="group" aria-label="Shipping option for the brief" id="brief-opt">
+              <button type="button" data-v="all" aria-pressed="false"><span lang="en">All</span><span lang="zh">全部</span></button>
+              <button type="button" data-v="speedpak" aria-pressed="false">SpeedPAK</button>
+              <button type="button" data-v="economy" aria-pressed="false">Economy</button>
+              <button type="button" data-v="express" aria-pressed="false">Express</button>
+              <button type="button" data-v="standard" aria-pressed="false">Standard</button>
+            </div>
+          </div>
+          <div class="dash-ctl"><span lang="en">Window</span><span lang="zh">时间窗口</span>
+            <div class="seg" role="group" aria-label="Window for the brief" id="brief-win">
+              <button type="button" data-v="w18" aria-pressed="false">W18–W21</button>
+              <button type="button" data-v="w22" aria-pressed="false"><span lang="en">W22–W25 · latest</span><span lang="zh">W22–W25 · 最近 4 周</span></button>
+            </div>
+          </div>
+          <button type="button" class="brief-go" id="brief-go"><span lang="en">Draft the brief</span><span lang="zh">生成简报</span></button>
+        </div>
+        <p class="note" id="brief-scope"></p>
+        <p class="brief-mode" id="brief-mode"></p>
+        <div class="brief-out" id="brief-out" aria-live="polite"></div>
+      </div>
+
+      <details class="how" id="brief-how">
+        <summary><span lang="en">How it works: what the program does, what the model does</span><span lang="zh">它如何工作：程序负责什么，模型负责什么</span></summary>
+        <div class="how-grid">
+          <div class="how-step">
+            <p class="hs-k"><span lang="en">1 · Program</span><span lang="zh">1 · 程序</span></p>
+            <p><span lang="en">Reads the filter, then works out for the window and the 4 weeks before it: coverage and adoption with their numerators and denominators, promised days by stage, on-time delivery, tracking coverage and complaints for each group, and every change. It checks data maturity: complaints need 30 days, so an unfinished window gets a status and a date instead of a number.</span><span lang="zh">读取筛选条件，算出本期和前 4 周的覆盖率、采用率（连同分子分母）、分段承诺天数，以及各组的准时送达率、追踪覆盖率、投诉率和全部变化值。同时检查数据是否成熟：投诉要满 30 天，没成熟的窗口只给状态和日期，不给数字。</span></p>
+          </div>
+          <div class="how-step">
+            <p class="hs-k"><span lang="en">2 · Structured input (excerpt, current scope)</span><span lang="zh">2 · 结构化输入（节选，当前范围）</span></p>
+            <pre class="how-pre" id="brief-input"></pre>
+          </div>
+          <div class="how-step">
+            <p class="hs-k"><span lang="en">3 · Model</span><span lang="zh">3 · 模型</span></p>
+            <p><span lang="en">Explains, never calculates: it may only quote numbers from the input. It answers three questions in a fixed JSON format; causes go under "can't tell yet" as things to verify; immature data gets a date, not a trend; the GMV share stays descriptive; every point names its chart.</span><span lang="zh">只解释，不计算：只能引用输入里的数字。按固定的 JSON 格式回答三个问题；原因只能写进"还回答不了"，作为待核查；未成熟的数据给日期、不给趋势；GMV 份额只做描述；每条要点注明对应的图。</span></p>
+          </div>
+        </div>
+        <ul class="how-why">
+          <li><span lang="en"><b>Why numbers come from the program.</b> A brief that recomputes a rate can get it wrong, and nobody can check it. Here every number in a brief must appear in the input, and a script verifies that.</span><span lang="zh"><b>为什么数字由程序算。</b>让模型自己算比例可能算错，也没法核对。这里简报里的每个数字都必须出现在输入里，并由脚本逐条检查。</span></li>
+          <li><span lang="en"><b>Why a fixed format.</b> The three questions and the chart key on every point are what make "click back to the chart" and the automatic checks possible.</span><span lang="zh"><b>为什么用固定格式。</b>三个问题的结构和每条要点上的图表标识，才让"点回图表"和自动检查成为可能。</span></li>
+          <li><span lang="en"><b>Why examples on this page.</b> The site is static (GitHub Pages) and an API key must not sit in the browser. Live drafts need a small server function that holds the key and forwards the structured input; until one is connected, the page shows briefs generated in advance from exactly the input shown above.</span><span lang="zh"><b>为什么这里是示例。</b>网站是静态托管（GitHub Pages），API 密钥不能放在浏览器里。实时生成需要一个保管密钥、转发结构化输入的小型服务端函数；接通之前，页面显示的是用上面这份输入预先生成的简报。</span></li>
+        </ul>
+        <details class="why">
+          <summary><span lang="en">The full system prompt</span><span lang="zh">完整系统提示</span></summary>
+          <pre class="how-pre" id="brief-system"></pre>
+        </details>
+      </details>
+
+      <div class="brief-eval" id="brief-eval">
+        <h3><span lang="en">How I checked the briefs</span><span lang="zh">我怎样验证简报</span></h3>
+        <div id="brief-eval-body"></div>
+      </div>
+    </section>
+
+    <!-- 3. My part -->
+    <section class="block" id="edd-role">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">My part</span><span lang="zh">我的贡献</span></p>
+        <h2><span lang="en">I owned the rollout monitoring: the metrics, the data and the dashboard</span><span lang="zh">我负责上线监控：定指标、备数据、搭看板</span></h2>
+      </div>
+      <dl class="facts wide">
+        <dt><span lang="en">Metrics</span><span lang="zh">设计监控指标</span></dt>
+        <dd><span lang="en">Broke "how is the rollout going?" into layers: coverage, adoption, promised days, on-time delivery, complaints and share of sales. Fixed the denominator of each one.</span><span lang="zh">把"模型上线得怎么样"拆成覆盖、采用、承诺天数、准时送达、投诉和成交份额几层，并为每个指标定好分母。</span></dd>
+        <dt><span lang="en">Data in SQL</span><span lang="zh">用 SQL 准备数据</span></dt>
+        <dd><span lang="en">Starting from transaction-level shipping data, flagged whether each order was within the model's scope and whether it used the model's date, then aggregated by week and by seller region, route, shipping option and other dimensions, from 2024 on. Also flagged incomplete weeks and weeks whose delivery and complaint data had not yet reached 7, 14 or 30 days.</span><span lang="zh">从交易级的物流数据出发，标出每笔订单是否在模型的使用范围内、是否采用了模型的时间，再按周和卖家地区、线路、运输方式等维度汇总，覆盖 2024 年以来的数据。同时标出数据不满一整周的周，以及签收、投诉数据还没满 7、14、30 天观察期的周。</span></dd>
+        <dt><span lang="en">Dashboard</span><span lang="zh">搭建自助看板</span></dt>
+        <dd><span lang="en">Calculated the metrics in Python (pandas) and built a dashboard in Plotly and Streamlit that the team can filter and split on its own.</span><span lang="zh">用 Python（pandas）计算指标，用 Plotly 和 Streamlit 做成团队可以自己筛选、拆分的看板。</span></dd>
+        <dt><span lang="en">Not mine</span><span lang="zh">不由我负责</span></dt>
+        <dd><span lang="en">The model itself was built by the model team.</span><span lang="zh">模型本身由模型团队开发。</span></dd>
+      </dl>
+    </section>
+
+    <!-- 4. Context -->
+    <section class="block" id="edd-context">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">Context</span><span lang="zh">背景</span></p>
+        <h2><span lang="en">The old rules promised long; the model's date is used only when it is shorter</span><span lang="zh">原规则的承诺偏长，模型给出的时间更短时才可能替换</span></h2>
+      </div>
+      <div class="prose">
+        <p><span lang="en">The platform used to set the delivery date with fixed rules. The rules were cautious, so buyers often saw long delivery promises, which can put them off buying. A promise that is too aggressive brings the opposite problem: parcels arrive late and buyers complain. The delivery date is a trade-off between conversion and fulfilment.</span><span lang="zh">过去平台按规则计算预计送达时间。规则偏保守，买家常看到较长的配送承诺，可能因此犹豫下单；可承诺如果过于激进、实际送不到，又会招来投诉。预计送达时间本身就是在转化和履约之间取舍。</span></p>
+        <p><span lang="en">The model covers orders that Greater China sellers ship from their home region, on the shipping options and destinations on the model's rollout list. It was rolled out in phases rather than all at once.</span><span lang="zh">模型的使用范围是大中华区卖家从本地发出、且运输方式和目的地在上线名单内的订单。模型分阶段上线，而不是一次性全量上线。</span></p>
+      </div>
+    </section>
+
+    <!-- 5. Result: what I delivered, what the team can answer with it -->
+    <section class="block" id="edd-result">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">Result</span><span lang="zh">结果</span></p>
+        <h2><span lang="en">Delivered a rollout dashboard the team can filter and split on its own</span><span lang="zh">交付了一个团队可以自己筛选、拆分的上线监控看板</span></h2>
+        <p style="margin-top:6px"><span class="verdict" style="--c:var(--slate)"><span lang="en">Delivered for weekly reporting and rollout feedback</span><span lang="zh">已交付，用于周报和上线反馈</span></span></p>
+      </div>
+      <div class="split">
+        <div class="col">
+          <h3><span lang="en">What I delivered</span><span lang="zh">交付了什么</span></h3>
+          <ul>
+            <li><span lang="en">Two pages. Sales: GMV, share of demand, indexes, and before-and-after against past years. Shipping: order mix, coverage and adoption, promised days, on-time delivery and complaints.</span><span lang="zh">两个页面。商业表现：成交额、市场份额、指数，以及上线前后与往年同期的比较。物流表现：订单结构、覆盖与采用、承诺天数、准时送达和投诉。</span></li>
+            <li><span lang="en">Filters for route, product category, seller region, item location, shipping option, tracking type, adoption, eligibility and seller management type.</span><span lang="zh">可按线路、品类、卖家地区、物品所在地、运输方式、物流跟踪类型、是否采用、是否符合条件、卖家管理类型筛选。</span></li>
+            <li><span lang="en">Two ways to read it: three years (2024–2026) side by side, or the current year split by eligibility, adoption or shipping option.</span><span lang="zh">两种看法：2024–2026 三年走势并排；或只看当年，按是否符合条件、是否采用、运输方式拆分。</span></li>
+            <li><span lang="en">Before, a new cut meant editing SQL, re-running it and rebuilding a slide. Now it is a filter change.</span><span lang="zh">以前换一个维度就要改 SQL、重新跑数、再做表；现在调一下筛选条件就行。</span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3><span lang="en">Questions the team can answer with it</span><span lang="zh">团队能用它回答的问题</span></h3>
+          <ul>
+            <li><span lang="en">For each shipping option, how much volume is within the model's scope, and how much of that used the model's date?</span><span lang="zh">各运输方式有多少订单在模型的使用范围内，其中多少实际采用了模型的时间？</span></li>
+            <li><span lang="en">Did the shorter promise come from seller handling, transit or the whole trip?</span><span lang="zh">承诺天数的缩短发生在卖家处理、运输，还是整体送达？</span></li>
+            <li><span lang="en">As promises got shorter, did on-time delivery or complaints get worse?</span><span lang="zh">承诺变短的同时，准时送达率和投诉率有没有变差？</span></li>
+            <li><span lang="en">How does Greater China sellers' share of demand compare with before launch and with the same weeks in past years?</span><span lang="zh">大中华区卖家的市场份额，相对上线前和往年同期的走势如何？</span></li>
+          </ul>
+        </div>
+      </div>
+      <p class="callout"><span lang="en">Evidence boundary: the dashboard is for monitoring and diagnosis. The material I have does not show that the model added sales, reduced complaints or raised overall on-time delivery. The adopted and not-adopted groups are observed, not assigned, and the comparison with past years is descriptive.</span><span lang="zh">证据边界：这个看板用于监控和诊断。现有材料没有验证模型带来的成交增量、投诉下降或整体准时率提升；采用与未采用两组是观察分组，与往年同期的比较是描述性分析。</span></p>
+    </section>
+
+    <!-- 6. Looking back -->
+    <section class="block" id="edd-learned">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">Looking back</span><span lang="zh">复盘</span></p>
+        <h2><span lang="en">A filter can quietly change what a metric means</span><span lang="zh">一个筛选条件，可能悄悄改掉指标的意思</span></h2>
+      </div>
+      <div class="split">
+        <div class="col">
+          <h3><span lang="en">What I learned</span><span lang="zh">学到的</span></h3>
+          <p><span lang="en">A global eligibility filter would have made coverage read 100%, because it cuts the denominator before the rate is taken (the design detail next to the coverage chart). When I design a metric now, I write its denominator down first and check which filters could change it.</span><span lang="zh">全局筛选"是否符合模型条件"会先把分母砍掉，让覆盖率永远显示 100%（见覆盖与采用图旁的设计细节）。现在设计指标时，我会先写清分母，再检查哪些筛选会改动它。</span></p>
+        </div>
+        <div class="col">
+          <h3><span lang="en">If I did it again</span><span lang="zh">如果重做</span></h3>
+          <ul>
+            <li><span lang="en">Replace the manual SQL export with a scheduled refresh.</span><span lang="zh">把手动跑 SQL、导出数据文件改成定时自动刷新。</span></li>
+            <li><span lang="en">With the rollout schedule in hand, compare routes that went live with routes not yet live (difference-in-differences). That says more about cause than before-and-after plus past years.</span><span lang="zh">如果能拿到上线分组信息，用已上线和未上线的线路做对照（双重差分），比只看前后和往年同期更能估计因果。</span></li>
+            <li><span lang="en">Add confidence intervals for small shipping options, so random swings are not read as the model's effect.</span><span lang="zh">给体量小的运输方式加置信区间，避免把随机波动读成模型效果。</span></li>
+          </ul>
+          <p class="note"><span lang="en">Tools: Hive SQL, Python (pandas), Plotly, Streamlit. Brief prototype (portfolio): JavaScript, the Claude API's structured outputs, a Python check script.</span><span lang="zh">工具：Hive SQL、Python（pandas）、Plotly、Streamlit。简报原型（作品集）：JavaScript、Claude API 结构化输出、Python 检查脚本。</span></p>
+        </div>
+      </div>
+    </section>
+
+  </section>
+  <!-- ======================================================================== 项目一结束 -->
+
+  <!-- ======================================================================== 项目二：PRCI（到「项目二结束」为止） -->
+  <section class="project" id="project-prci" data-project="prci" data-title-en="PRCI · Trust-risk attribution · Portfolio" data-title-zh="PRCI · 交易风险归因 · 求职作品集">
+    <div class="masthead">
+      <p class="eyebrow"><span lang="en">eBay · Trust and risk · Internship project</span><span lang="zh">eBay · 交易风险 · 实习项目</span></p>
+      <h1><span lang="en">eBay trust and risk: the high-risk share of Fashion sales rose. What pushed it up?</span><span lang="zh">eBay 交易风险｜高风险成交占比上升，是谁推高的？</span></h1>
+      <p class="lede"><span lang="en">During my eBay internship, Fashion's high-risk share of sales turned up again at the end of June 2026. I built the data from transaction detail, used a shift-share decomposition to assign the change to each category, and delivered a five-page dashboard; risk strategy and actions belong to the team.</span><span lang="zh">在 eBay 实习时，Fashion 的高风险成交占比在 2026 年 6 月底再次上行。我从交易明细搭数据，用 Shift-Share 把变化分到每个品类，并交付了五页看板；风险策略和具体处置由团队负责。</span></p>
+      <div class="tour-cta" id="review-cta">
+        <a class="tour-go" href="#review" data-review-start><span lang="en">Can this risk recommendation go to the strategy team?</span><span lang="zh">这条风控建议，可以发给策略团队吗？</span><span class="arr" aria-hidden="true">→</span></a>
+        <p class="note"><span lang="en"><b>AI recommendation review demo</b> · the draft is a hand-built test case; the charts use illustrative data. About 2 minutes, three sentences.</span><span lang="zh"><b>AI 建议审核演示</b> · 草稿为人工构造的测试样例，图表使用示意数据。约 2 分钟，逐句审 3 句。</span></p>
+      </div>
+      <p class="lede-sm"><span lang="en">The high-risk share (High Risk GMV Mix) is the part of Fashion's sales (GMV) that comes from high-risk sellers. A seller's risk tier comes from the team's PRCI tiering (high, medium, low), taken from the latest snapshot when the data was pulled.</span><span lang="zh">高风险成交占比（High Risk GMV Mix）是 Fashion 总成交额（GMV）中来自高风险卖家的比例。卖家的风险等级来自团队的 PRCI 分层（高、中、低三档），取跑表时的最新快照。</span></p>
+    </div>
+
+    <!-- 0. The review demo: a hand-built AI draft, judged sentence by sentence against the dashboard below (../prci-review.js).
+         Designed for the portfolio after the internship; the judgements are preset, no model is called. -->
+    <section class="block" id="review">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">AI recommendation review demo · portfolio extension</span><span lang="zh">AI 建议审核演示 · 作品集扩展</span></p>
+        <h2><span lang="en">Can this risk recommendation go to the strategy team?</span><span lang="zh">这条风控建议，可以发给策略团队吗？</span></h2>
+        <p class="dek"><span lang="en">An AI assistant drafted the paragraph below from this page's dashboard. For each sentence, decide: keep, rewrite, or needs more data. Then open the evidence and check.</span><span lang="zh">假设一个 AI 助手根据本页看板起草了下面这段建议。逐句判断「可保留」「需改写」还是「需补数据」，再打开对应的证据核对。</span></p>
+      </div>
+      <dl class="own">
+        <div><dt><span lang="en">Delivered during the internship</span><span lang="zh">实习期间实际交付</span></dt><dd><span lang="en">The data analysis, the contribution decomposition and the five-page dashboard. Risk strategy and actions belong to the team.</span><span lang="zh">数据分析、贡献分解和五页看板。风险策略和具体处置由团队负责。</span></dd></div>
+        <div><dt><span lang="en">Designed afterwards for this portfolio</span><span lang="zh">实习结束后为作品集设计</span></dt><dd><span lang="en">This review experience. The draft is a test case I wrote by hand, not model output and not a real team recommendation; the judgements and reasons are preset, and the charts use illustrative data.</span><span lang="zh">这个审核体验。草稿是我人工构造的测试样例，不是模型输出，也不是团队的真实建议；判断和依据是预设的，图表使用示意数据。</span></dd></div>
+      </dl>
+      <div class="rv" id="rv">
+        <div class="rv-draft" id="rv-draft"></div>
+        <aside class="tour rv-card" id="rv-card" aria-live="polite"></aside>
+        <div class="rv-final" id="rv-final" hidden></div>
+      </div>
+      <noscript><p class="note">The review needs JavaScript. 审核演示需要启用 JavaScript。</p></noscript>
+
+      <details class="how" id="rv-accept">
+        <summary><span lang="en">How I would accept this AI feature</span><span lang="zh">我会怎样验收这个 AI 功能</span></summary>
+        <p class="brief-mode"><span lang="en">How this demo works: the three judgements and their reasons are written in advance; no model is called. What follows is the acceptance design for a real version. It has not been run against a model, so there are no model test results here.</span><span lang="zh">演示方式：三句的判断和依据是预先写好的，没有调用模型。下面是真实版本的验收设计，还没有用模型跑过，所以这里没有模型测试结果。</span></p>
+        <h4 class="rv-h"><span lang="en">The smallest test pair</span><span lang="zh">最小测试对</span></h4>
+        <div class="table-wrap"><table class="ev-table">
+          <thead><tr><th><span lang="en">Claim to review</span><span lang="zh">待审核的说法</span></th><th><span lang="en">Expected judgement</span><span lang="zh">期望判断</span></th><th><span lang="en">Why</span><span lang="zh">理由</span></th></tr></thead>
+          <tbody>
+            <tr><td><b><span lang="en">"High-risk sellers' share of GMV rose."</span><span lang="zh">「高风险卖家的成交额占比上升。」</span></b></td><td><span lang="en">Supported by current data</span><span lang="zh">有现有数据支撑</span></td><td><span lang="en">The metric is exactly this: high-risk sellers' GMV ÷ all Fashion GMV. Evidence: the contributions page and the category trend.</span><span lang="zh">指标本身就是它：高风险卖家成交额 ÷ Fashion 总成交额。证据：贡献分解页、品类趋势页。</span></td></tr>
+            <tr><td><b><span lang="en">"High-risk sellers' share of sellers rose."</span><span lang="zh">「高风险卖家的人数占比上升。」</span></b></td><td><span lang="en">Not supported yet: needs data</span><span lang="zh">现有数据不支撑，需补数据</span></td><td><span lang="en">Missing: a seller-count denominator (sellers active in each window), and risk tiers as they applied each week. Today's tiers are the latest snapshot, applied to every past week.</span><span lang="zh">缺两项：按卖家计数的分母（各窗口的在售卖家数），以及每周当时生效的风险等级。现有标签是跑表时的最新快照，回填到所有历史周。</span></td></tr>
+          </tbody>
+        </table></div>
+        <h4 class="rv-h"><span lang="en">Pass criteria (design)</span><span lang="zh">验收标准（设计方案）</span></h4>
+        <ol class="how-why">
+          <li><span lang="en">Both claims get the right judgement, and the second is never "fixed" into a number the data cannot give.</span><span lang="zh">两句都判断正确；第二句不能被改写成一个数据给不出的数字。</span></li>
+          <li><span lang="en">For the unsupported claim, the review names what is missing (the denominator, the scope or the label timing), not just "not enough data".</span><span lang="zh">对不支撑的那句，要说出具体缺哪一项（分母、范围还是标签时间），而不是笼统地说"数据不足"。</span></li>
+          <li><span lang="en">Every judgement points to one evidence chart, or says plainly that no chart covers it.</span><span lang="zh">每个判断都指向一张证据图；没有对应的图，就明确说没有。</span></li>
+          <li><span lang="en">Rewording does not change the verdict ("more high-risk sellers" fails like "a higher count share"; "high-risk sellers' sales weigh more" passes like "a higher GMV share").</span><span lang="zh">换个说法结论不变：「高风险卖家变多了」和「人数占比上升」一样不通过，「高风险卖家的销售额比重提高」和「成交额占比上升」一样通过。</span></li>
+          <li><span lang="en">It never proposes whom to act on; that decision stays with the strategy team.</span><span lang="zh">不提出具体处置对象；这个决定留给策略团队。</span></li>
+        </ol>
+        <h4 class="rv-h"><span lang="en">What the review needs to be given, for every claim</span><span lang="zh">审核时要一并传入的四项信息</span></h4>
+        <dl class="defs four rv-inputs">
+          <div><dt><span lang="en">Denominator</span><span lang="zh">指标分母</span></dt><dd><span lang="en">All Fashion GMV (inside a category: that category's GMV). GMV, not sellers.</span><span lang="zh">Fashion 总成交额（品类内为该品类的成交额）。按成交额，不按卖家数。</span></dd></div>
+          <div><dt><span lang="en">Scope</span><span lang="zh">分析范围</span></dt><dd><span lang="en">Fashion, before Jun 7–21 vs after Jun 28–Jul 12; seller concentration exists only for Fashion as a whole.</span><span lang="zh">Fashion；基期 6/7–6/21 对观察期 6/28–7/12；卖家集中度只有 Fashion 整体。</span></dd></div>
+          <div><dt><span lang="en">Label timing</span><span lang="zh">标签取值时间</span></dt><dd><span lang="en">Risk tiers from the latest snapshot when the data was pulled, applied to every past week.</span><span lang="zh">风险等级取跑表时的最新快照，回填到所有历史周。</span></dd></div>
+          <div><dt><span lang="en">Evidence chart</span><span lang="zh">对应证据图表</span></dt><dd><span lang="en">The dashboard page and chart behind each number, e.g. contributions (CTV), seller concentration (Fashion only).</span><span lang="zh">每个数字背后的看板页和图，例如贡献分解（CTV）、卖家集中度（仅 Fashion 整体）。</span></dd></div>
+        </dl>
+      </details>
+    </section>
+
+    <!-- 1. My part, first -->
+    <section class="block" id="prci-role">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">My part</span><span lang="zh">我的贡献</span></p>
+        <h2><span lang="en">I did the data, the decomposition and the dashboard on my own</span><span lang="zh">数据、贡献分解和看板由我独立完成</span></h2>
+      </div>
+      <dl class="facts wide">
+        <dt><span lang="en">Framing</span><span lang="zh">定义问题</span></dt>
+        <dd><span lang="en">Turned "the metric went up" into questions that can be checked: numerator and denominator first, then six ways to slice, then a decomposition that puts a number on each category.</span><span lang="zh">把"指标涨了"变成可以核验的问题：先拆分子分母，再按六个维度切分，最后用贡献分解把变化量化到每个品类。</span></dd>
+        <dt><span lang="en">Data in Spark SQL</span><span lang="zh">用 Spark SQL 建宽表</span></dt>
+        <dd><span lang="en">Starting from transaction detail, built a seller × retail week × dimension table joined to category, seller market, risk tier, managed status, seller tenure and action records: 54 retail weeks, over 1,000 third-level categories, about 2.35 million rows.</span><span lang="zh">从交易明细出发，建「卖家 × 零售周 × 维度」宽表，关联品类、卖家市场、风险分层、托管状态、新老卖家和处置记录，覆盖 54 个零售周、1,000 多个三级品类，约 235 万行。</span></dd>
+        <dt><span lang="en">Checks</span><span lang="zh">核验口径</span></dt>
+        <dd><span lang="en">Fixed four things that would have bent the numbers: action records de-duplicated by seller and route together; the seller-concentration data keeps every risk tier, so total GMV is not counted as high-risk GMV; an unused join removed; unmatched categories kept as "other" so totals and the decomposition reconcile.</span><span lang="zh">修正了四处会让数字失真的实现问题：处置清单按卖家和线路一起去重；卖家集中度数据保留全部风险等级，避免把总成交额算成高风险成交额；删掉没被用到的关联表；匹配不上的品类归入「其他」，保证总额和贡献分解对得上。</span></dd>
+        <dt><span lang="en">Decomposition</span><span lang="zh">贡献分解</span></dt>
+        <dd><span lang="en">Implemented the shift-share (CTV) in pandas, splitting the overall change into a rate effect and a mix effect for each category, and checked that the contributions add up to the overall change.</span><span lang="zh">用 Pandas 实现 Shift-Share（CTV），把整体变化拆成每个品类的 Rate 效应和 Mix 效应，并核对各品类贡献之和等于整体变化。</span></dd>
+        <dt><span lang="en">Dashboard</span><span lang="zh">搭建看板</span></dt>
+        <dd><span lang="en">Built a five-page dashboard in Plotly and Streamlit: category trends, seller concentration, contribution analysis, segments and category concentration.</span><span lang="zh">用 Plotly 和 Streamlit 做成五页看板：品类趋势、卖家集中度、贡献分解、分群对比、品类集中度。</span></dd>
+        <dt><span lang="en">Not mine</span><span lang="zh">不由我负责</span></dt>
+        <dd><span lang="en">Risk rules, strategy and the actions taken belong to the team.</span><span lang="zh">风险规则、策略和具体处置由团队决定和执行。</span></dd>
+      </dl>
+    </section>
+
+    <!-- 2. Context -->
+    <section class="block" id="prci-context">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">Context</span><span lang="zh">背景</span></p>
+        <h2><span lang="en">Fashion's high-risk share has long run high, and turned up again in late June</span><span lang="zh">Fashion 的高风险成交占比一直偏高，6 月底又往上走</span></h2>
+      </div>
+      <div class="prose">
+        <p><span lang="en">eBay's Shipping &amp; Trust team watches risk and experience metrics to spot problems that could hurt buyers, sellers and trust in the marketplace, and supplies the data for risk governance. Monitoring across verticals showed that Fashion's high-risk share had long been above most other verticals, and that it rose again at the end of June 2026.</span><span lang="zh">eBay 的 Shipping &amp; Trust 团队监控风险和体验指标，找出可能影响买家体验、卖家经营和平台交易信任的问题，为风险治理提供数据支持。跨类目的监控显示，Fashion 的高风险成交占比长期高于多数类目，并在 2026 年 6 月底出现新的上行。</span></p>
+        <p><span lang="en">The team wanted to know two things: which third-level categories the change came from, and whether the risk sat with a few high-risk sellers. The formal analysis compares three retail weeks before and after the end of June (Jun 7–21 vs Jun 28–Jul 12, 2026).</span><span lang="zh">团队想知道两件事：变化主要出在哪些三级品类；风险是不是集中在少数高风险卖家身上。正式分析比较 6 月底前后各三个零售周（2026 年 6/7–6/21 对 6/28–7/12）。</span></p>
+      </div>
+    </section>
+
+    <!-- 3. Method: numerator and denominator, then shift-share -->
+    <section class="block" id="prci-method">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">Method</span><span lang="zh">怎么拆</span></p>
+        <h2><span lang="en">A rising share does not mean more high-risk sales</span><span lang="zh">比例上升，不等于高风险成交额在增长</span></h2>
+      </div>
+      <div class="split">
+        <div class="col">
+          <p><span lang="en">The high-risk share = high-risk sellers' GMV ÷ all Fashion GMV. As a ratio it can rise because the top grows or because the bottom shrinks. Checking both showed that high-risk GMV itself fell between the two windows; all Fashion GMV fell faster, so the share edged up.</span><span lang="zh">高风险成交占比 = 高风险卖家成交额 ÷ Fashion 总成交额。它是比例，上涨可能来自分子变大，也可能来自分母变小。核验后发现，两个窗口之间高风险成交额本身是下降的，只是 Fashion 总成交额降得更多，比例才小幅上升。</span></p>
+          <p><span lang="en">Ranking categories by how much they moved cannot tell whether high-risk sellers took a larger share of a category's sales or the category simply got bigger, and a small category's big swing can matter less than a large category's small one. So the overall share is written as a sum over categories, and its change is split exactly.</span><span lang="zh">只按各品类的涨跌排序，分不清是品类里高风险卖家的成交额比重变大了，还是品类只是变重了；小品类的大幅波动，也可能比不上大品类的小幅变化。所以把整体占比写成各品类之和，再把它的变化精确拆开。</span></p>
+        </div>
+        <dl class="facts">
+          <dt><span lang="en">Overall share</span><span lang="zh">整体占比</span></dt>
+          <dd><span lang="en">R = Σ (category's weight in Fashion GMV × the share of the category's GMV from high-risk sellers).</span><span lang="zh">R = Σ（品类在 Fashion 成交额中的权重 × 品类内高风险卖家的成交额占比）。</span></dd>
+          <dt><span lang="en">Rate effect</span><span lang="zh">Rate 效应</span></dt>
+          <dd><span lang="en">Change in the share of the category's GMV from high-risk sellers × its weight after. Did today's high-risk sellers take a larger share of the category's sales? It is a GMV share: it says nothing about how many sellers are high-risk, or when any seller's tier changed.</span><span lang="zh">品类内高风险卖家成交额占比的变化 × 观察期的品类权重。回答「在这个品类里，当前被标为高风险的卖家，成交额比重有没有变大」。它按成交额计算，说明不了高风险卖家有多少个，也说明不了谁在什么时候变更了等级。</span></dd>
+          <dt><span lang="en">Mix effect</span><span lang="zh">Mix 效应</span></dt>
+          <dd><span lang="en">Change in the category's weight × (its share before − the overall share before). Did an above-average category get heavier?</span><span lang="zh">品类权重的变化 ×（该品类基期占比 − 整体基期占比）。回答"一个高于平均的品类，是不是在整体里变重了"。</span></dd>
+          <dt><span lang="en">CTV</span><span lang="zh">CTV</span></dt>
+          <dd><span lang="en">A category's contribution ÷ the overall change. They sum to 100%; when pushes and pulls offset and the net change is small, one category can be above 100% or negative.</span><span lang="zh">品类贡献 ÷ 整体变化。各品类合计为 100%；正负相互抵消、整体变化很小时，单个品类可以超过 100%，也可以是负数。</span></dd>
+          <dt><span lang="en">Check</span><span lang="zh">核对</span></dt>
+          <dd><span lang="en">Rate plus mix, summed over all categories, must equal the overall share after minus before.</span><span lang="zh">所有品类的 Rate 加 Mix 之和，必须等于观察期减基期的整体变化。</span></dd>
+        </dl>
+      </div>
+    </section>
+
+    <!-- 4. Result -->
+    <section class="block" id="prci-result">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">Result</span><span lang="zh">结果</span></p>
+        <h2><span lang="en">Narrowed it to one category, one market and the mid-tier sellers</span><span lang="zh">定位到一个主要品类、一个市场和一群中腰部卖家</span></h2>
+        <p style="margin-top:6px"><span class="verdict" style="--c:var(--hr)"><span lang="en">Analysis done; decisions on action still in progress</span><span lang="zh">分析已完成，治理决策仍在推进</span></span></p>
+      </div>
+      <div class="split">
+        <div class="col">
+          <h3><span lang="en">What the analysis found</span><span lang="zh">定位到了什么</span></h3>
+          <ul>
+            <li><span lang="en">The late-June rise was driven mainly by Men's Shoes, and mostly by high-risk sellers taking a larger share of the category's GMV (rate effect) rather than by Men's Shoes getting heavier. Other categories pulled the other way, so the overall share rose only a little.</span><span lang="zh">6 月底的上行主要由男鞋推动，而且主要来自男鞋品类内高风险卖家的成交额比重上升（Rate 效应），而不是男鞋在 Fashion 里变重。其他品类有明显的反向抵消，所以整体只小幅上升。</span></li>
+            <li><span lang="en">The category with the most high-risk GMV is Men's Clothing; this time it was among the categories pulling the share down. "Contributed most to the change" and "has the most high-risk GMV" are different things.</span><span lang="zh">高风险成交额最大的品类是男装；这一次它属于往下拉的品类。「对这次变化贡献最大」和「高风险成交额体量最大」是两回事。</span></li>
+            <li><span lang="en">By market, HIPO was the only one where high-risk sellers' share of its GMV rose.</span><span lang="zh">按市场看，HIPO 是唯一一个高风险卖家成交额比重上升的市场。</span></li>
+            <li><span lang="en">High-risk GMV is not concentrated at the top: the top 10 sellers hold a small part, and the largest bucket is sellers ranked 101–500.</span><span lang="zh">高风险成交额并不集中在头部：前 10 名卖家只占一小部分，占比最大的一组是排名 101–500 的中腰部卖家。</span></li>
+            <li><span lang="en">Ever-actioned, existing and unmanaged sellers show patterns worth watching, but explaining them needs time-aware labels or a comparison group.</span><span lang="zh">曾被处置、老卖家和非托管卖家呈现值得持续关注的特征，但要解释原因，需要按时间区分的标签或对照分析。</span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3><span lang="en">What I handed over</span><span lang="zh">交付了什么</span></h3>
+          <ul>
+            <li><span lang="en">The location of the change, the main contributors and the seller concentration, as evidence for the team's next steps.</span><span lang="zh">异常出在哪里、主要贡献因素和卖家集中度，作为团队下一步的事实依据。</span></li>
+            <li><span lang="en">A five-page dashboard that drills from the overall share down to categories and sellers; the formal three-week-versus-three-week window is used throughout.</span><span lang="zh">一个五页看板，可以从整体异常下钻到品类和卖家；全程统一使用三周对三周的正式窗口。</span></li>
+          </ul>
+          <h3><span lang="en">Directions suggested to the team</span><span lang="zh">提给团队的排查方向</span></h3>
+          <ul>
+            <li><span lang="en">Look first at Men's Shoes sellers and their risk patterns, and at the HIPO market.</span><span lang="zh">优先排查男鞋相关卖家和风险模式，重点关注 HIPO 市场。</span></li>
+            <li><span lang="en">For mid-tier sellers, consider rules, models or batch monitoring rather than case-by-case work on the top sellers.</span><span lang="zh">对中腰部卖家考虑系统性的规则、模型或批量监控，而不只逐个治理头部卖家。</span></li>
+            <li><span lang="en">For actioned sellers, monitor recurrence with before/after states. The strategy team decides the actual rules, weighing cost, coverage and false positives.</span><span lang="zh">为曾被处置的卖家建立区分处置前后的复发监控。具体规则由风险策略团队结合成本、覆盖率和误伤风险决定。</span></li>
+          </ul>
+        </div>
+      </div>
+      <p class="callout"><span lang="en">Evidence boundary: the project located and quantified the change; actions are still being decided, so there is no measured improvement. Risk tiers are the latest snapshot applied to all past weeks, so the analysis describes how today's high-risk sellers contributed over time, not the risk as labelled in each week. "Ever actioned" is a seller attribute and says nothing about whether actions worked.</span><span lang="zh">证据边界：项目完成的是定位和量化归因，治理措施还在推进，没有可验证的指标改善。风险等级用的是跑表时的最新快照，回填到所有历史周，描述的是「当前高风险卖家在历史上的贡献」，不是每周当时的风险暴露。「曾被处置」是卖家属性，不能说明处置有效或无效。</span></p>
+      <p class="note"><a href="#prci-dashboard"><span lang="en">See the dashboard ↓</span><span lang="zh">浏览看板 ↓</span></a></p>
+    </section>
+
+    <!-- 5. The dashboard, rebuilt for the web: the five pages of the delivered one, drawn by ../dash-prci.js from illustrative data -->
+    <section class="block" id="prci-dashboard">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">The dashboard</span><span lang="zh">看板</span></p>
+        <h2><span lang="en">The five pages of the dashboard, rebuilt as part of this page</span><span lang="zh">按原看板的五页内容，重做成网页里的看板</span></h2>
+        <p class="dek"><span lang="en">Rebuilt from the dashboard I delivered during the internship; the data shown is illustrative.</span><span lang="zh">根据实习期间实际交付的看板重制，展示数据为示意。</span></p>
+      </div>
+
+      <div class="dash" data-dash data-prci-dash>
+        <div class="case-tabs" role="tablist" aria-label="Dashboard pages">
+          <button type="button" role="tab" id="prci-dashboard-cat" aria-controls="p-panel-cat" aria-selected="true"><span lang="en">Category trends</span><span lang="zh">品类趋势</span></button>
+          <button type="button" role="tab" id="prci-dashboard-ctv" aria-controls="p-panel-ctv" aria-selected="false" tabindex="-1"><span lang="en">Contributions (CTV)</span><span lang="zh">贡献分解 · CTV</span></button>
+          <button type="button" role="tab" id="prci-dashboard-seller" aria-controls="p-panel-seller" aria-selected="false" tabindex="-1"><span lang="en">Seller concentration</span><span lang="zh">卖家集中度</span></button>
+          <button type="button" role="tab" id="prci-dashboard-seg" aria-controls="p-panel-seg" aria-selected="false" tabindex="-1"><span lang="en">Segments</span><span lang="zh">分群对比</span></button>
+          <button type="button" role="tab" id="prci-dashboard-catcon" aria-controls="p-panel-catcon" aria-selected="false" tabindex="-1"><span lang="en">Category concentration</span><span lang="zh">品类集中度</span></button>
+        </div>
+        <noscript><p class="note">The charts need JavaScript. 看板图表需要启用 JavaScript。</p></noscript>
+
+        <!-- 1. Category trends -->
+        <div class="dash-panel" id="p-panel-cat" role="tabpanel" aria-labelledby="prci-dashboard-cat">
+          <div class="dash-block">
+            <div class="dash-ctl"><span lang="en">Category</span><span lang="zh">品类</span></div>
+            <div class="chip-pick" role="group" aria-label="Category" id="p-cat-pick"></div>
+            <p class="caption" id="p-cat-cap"></p>
+          </div>
+          <div class="dash-grid2">
+            <div class="dash-block">
+              <h3 class="dash-h"><span lang="en">High-risk share of GMV, by week</span><span lang="zh">每周的高风险成交占比</span></h3>
               <ul class="key">
-                <li><span class="sw" style="--c:var(--adopt)"></span><span lang="en">Used the model · 20</span><span lang="zh">实际采用模型 · 20</span></li>
-                <li><span class="sw" style="--c:var(--elig)"></span><span lang="en">Eligible, not used · 60</span><span lang="zh">符合条件但未采用 · 60</span></li>
-                <li><span class="sw" style="--c:var(--uncov)"></span><span lang="en">Not covered · 20</span><span lang="zh">未覆盖 · 20</span></li>
+                <li><span class="sw" style="--c:var(--ink)"></span><span lang="en">Fashion overall</span><span lang="zh">Fashion 整体</span></li>
+                <li><span class="sw" style="--c:var(--hr)"></span><span lang="en">Chosen category</span><span lang="zh">所选品类</span></li>
+              </ul>
+              <div class="chart" id="p-cat-mix"></div>
+            </div>
+            <div class="dash-block">
+              <div class="dash-bar">
+                <h3 class="dash-h" id="p-risk-title"></h3>
+                <div class="seg" role="group" aria-label="Risk metric" id="p-metric">
+                  <button type="button" data-v="inr" aria-pressed="true">INR</button>
+                  <button type="button" data-v="snad" aria-pressed="false">SNAD</button>
+                  <button type="button" data-v="loss" aria-pressed="false">LOSS</button>
+                </div>
+              </div>
+              <ul class="key">
+                <li><span class="sw" style="--c:var(--hr)"></span><span lang="en">High-risk sellers</span><span lang="zh">高风险卖家</span></li>
+                <li><span class="sw" style="--c:var(--nonhr)"></span><span lang="en">Other sellers</span><span lang="zh">其他卖家</span></li>
+              </ul>
+              <div class="chart" id="p-cat-risk"></div>
+              <p class="caption"><span lang="en">30-day measures need 30 days to settle, so weeks after Jun 14 are not drawn.</span><span lang="zh">30 天类指标要等 30 天才完整，6/14 之后的周不画线。</span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Contributions -->
+        <div class="dash-panel" id="p-panel-ctv" role="tabpanel" aria-labelledby="prci-dashboard-ctv">
+          <div class="dash-block" id="p-ctv-blk">
+            <div class="eqs" id="p-ctv-eqs"></div>
+            <div class="dash-bar">
+              <h3 class="dash-h"><span lang="en">Each category's contribution to the change, pp</span><span lang="zh">各品类对整体变化的贡献（pp）</span></h3>
+              <ul class="key">
+                <li><span class="sw" style="--c:var(--rate-eff)"></span><span lang="en">Rate effect</span><span lang="zh">Rate 效应</span></li>
+                <li><span class="sw" style="--c:var(--mix-eff)"></span><span lang="en">Mix effect</span><span lang="zh">Mix 效应</span></li>
+                <li><span class="sw" style="--c:var(--ink)"></span><span lang="en">Total</span><span lang="zh">合计</span></li>
               </ul>
             </div>
+            <div class="chart" id="p-ctv-bars"></div>
+            <div class="ctv-note" id="p-ctv-note">
+              <p class="tb-k"><span lang="en">Reading the rate effect</span><span lang="zh">读 Rate 效应时要注意</span></p>
+              <p><span lang="en">The rate effect is the change in the share of a category's GMV that comes from high-risk sellers. For Men's Shoes, what the data supports is: <b>within Men's Shoes, sellers currently tagged high-risk account for a larger share of GMV.</b></span><span lang="zh">Rate 效应是「品类内高风险卖家成交额占比」的变化。以男鞋为例，数据支持的说法是：<b>在男鞋品类里，当前被标为高风险的卖家贡献了更高比例的成交额。</b></span></p>
+              <ul>
+                <li><span lang="en">It is measured in GMV. The share can grow because these sellers sold more or because the others sold less; it says nothing about how many sellers are high-risk.</span><span lang="zh">它按成交额计算：比重变大，可能是这些卖家卖得更多，也可能是其他卖家卖得更少，推不出高风险卖家的人数变化。</span></li>
+                <li><span lang="en">Risk tiers come from the latest snapshot when the data was pulled, applied to every past week. Both windows use the same tiers, so the change is not "sellers becoming high-risk", and the data cannot show in which week a seller's tier changed.</span><span lang="zh">风险标签取自跑表时的最新快照，回填到所有历史周：基期和观察期用的是同一份标签，所以这个变化不是"卖家变成了高风险"，也还原不了卖家在哪一周变更了等级。</span></li>
+              </ul>
+            </div>
+            <p class="caption"><span lang="en">Right of zero pushes the share up, left pulls it down. The rows add up to the overall change exactly; hover a row for its CTV.</span><span lang="zh">零线右边是推高，左边是拉低。各行加起来正好等于整体变化；鼠标停在某一行可以看到它的 CTV。</span></p>
           </div>
-          <figcaption class="caption"><span lang="en">Illustrative data. Same ratios as the dashboard's all-options total.</span><span lang="zh">示意数据，比例与完整看板中全部物流方式的合计一致。</span> <a href="cases/ebay-edd.html#dashboard-shipping"><span lang="en">See the full dashboard →</span><span lang="zh">查看完整看板 →</span></a></figcaption>
-        </figure>
-        <div class="cl-body">
-          <p class="one"><span lang="en">A new model gave orders from Greater China cross-border sellers shorter estimated delivery dates and went live in phases. I designed the monitoring metrics, prepared the data in SQL and built a self-serve dashboard, so the team could keep two questions apart: how many orders the model reached and actually changed, and whether the shorter promises hurt on-time delivery or complaints.</span><span lang="zh">新模型为大中华区跨境卖家的订单给出更短的预计送达时间，分阶段上线。我设计监控指标、用 SQL 准备数据、搭建自助看板，让团队把两件事分开看：模型覆盖并实际改变了多少订单；更短的承诺有没有影响准时送达和投诉。</span></p>
-          <p class="legend"><span class="chip static">Hive SQL</span><span class="chip static">Python (pandas)</span><span class="chip static">Plotly</span><span class="chip static">Streamlit</span></p>
-          <p class="more"><a href="cases/ebay-edd.html#demo"><span lang="en">Decide with me in 2 minutes →</span><span lang="zh">跟我判断一次（2 分钟）→</span></a><a href="cases/ebay-edd.html"><span lang="en">Read the full case →</span><span lang="zh">阅读完整案例 →</span></a></p>
+          <div class="dash-block">
+            <h3 class="dash-h"><span lang="en">The same numbers as a table</span><span lang="zh">同一组数字的明细表</span></h3>
+            <div class="table-wrap"><table id="p-ctv-table"></table></div>
+            <p class="caption"><span lang="en">Click a column header to sort. CTV can exceed 100% when other categories offset; it is a share of a small net change.</span><span lang="zh">点表头可以排序。其他品类抵消、整体变化很小时，CTV 会超过 100%：它是相对一个很小的净变化而言的。</span></p>
+          </div>
         </div>
-      </li>
-      <li class="has-shot" style="--c:var(--hr)">
-        <div class="cl-meta">
-          <p class="eyebrow"><span lang="en">eBay · Trust and risk · Internship</span><span lang="zh">eBay · 交易风险 · 实习项目</span></p>
-          <h3><a href="cases/prci.html"><span lang="en">eBay trust and risk: the high-risk share of Fashion sales rose. What pushed it up?</span><span lang="zh">eBay 交易风险｜高风险成交占比上升，是谁推高的？</span></a></h3>
-        </div>
-        <!-- Preview: the shift-share in three rows, drawn by dash-prci.js from the same illustrative data as the case dashboard. -->
-        <figure class="cl-shot cov-demo prci-demo" data-prci-demo data-mode="net">
-          <div class="cov-top">
-            <p class="cov-title"><span lang="en">High-risk share: a small net rise, with big moves underneath</span><span lang="zh">高风险成交占比：整体只动了一点，底下在拉扯</span></p>
-            <div class="seg" role="group" aria-label="View">
-              <button type="button" data-mode="net" aria-pressed="true"><span lang="en">Net</span><span lang="zh">合计</span></button>
-              <button type="button" data-mode="split" aria-pressed="false"><span lang="en">Rate and mix</span><span lang="zh">拆成两种效应</span></button>
+
+        <!-- 3. Seller concentration -->
+        <div class="dash-panel" id="p-panel-seller" role="tabpanel" aria-labelledby="prci-dashboard-seller">
+          <div class="dash-block" id="p-sel-blk">
+            <div class="dash-bar">
+              <h3 class="dash-h"><span lang="en">High-risk GMV by seller rank</span><span lang="zh">高风险成交额按卖家排名分组</span> <span class="scope-tag" id="p-sel-scope"><span lang="en">Scope: all of Fashion</span><span lang="zh">范围：整个 Fashion</span></span></h3>
+              <div class="seg" role="group" aria-label="Window" id="p-sel-win">
+                <button type="button" data-v="pre" aria-pressed="false"><span lang="en">Before</span><span lang="zh">基期</span></button>
+                <button type="button" data-v="post" aria-pressed="true"><span lang="en">After</span><span lang="zh">观察期</span></button>
+              </div>
+            </div>
+            <div class="eqs" id="p-sel-eqs"></div>
+            <div class="chart" id="p-sel-chart"></div>
+            <p class="caption"><span lang="en">Bars: each rank group's share of high-risk GMV. Line: the cumulative share from the top down. Sellers are ranked across all of Fashion, not within a category. The underlying data keeps every risk tier so the totals are right.</span><span lang="zh">柱子是每个排名组占高风险成交额的比例，折线是从头部往下的累计占比。卖家按整个 Fashion 排名，不分品类。底层数据保留全部风险等级，保证总额正确。</span></p>
+            <div class="missing" id="p-sel-missing">
+              <p class="tb-k"><span lang="en">What this chart cannot answer</span><span lang="zh">这张图回答不了的问题</span></p>
+              <p><span lang="en">Where is Men's Shoes' high-risk GMV concentrated, and in which sellers? That needs a Men's Shoes × seller-rank breakdown for both windows, then the risk records of the sellers concerned. The illustrative data has no such cross-cut, so no chart is drawn here.</span><span lang="zh">男鞋内部的高风险成交额集中在哪些卖家？要回答它，需要补「男鞋 × 卖家排名」的交叉分布（基期和观察期），再结合相关卖家的具体风险记录。示意数据没有这个交叉维度，所以这里不画图。</span></p>
             </div>
           </div>
-          <div class="chart"></div>
-          <div class="cov-read" aria-live="polite">
-            <p class="cov-eq" data-eq></p>
-            <p class="cov-def" data-def></p>
-            <ul class="key" data-show="split" hidden>
-              <li><span class="sw" style="--c:var(--rate-eff)"></span><span lang="en">Rate effect: high-risk sellers' share of the category's GMV changed</span><span lang="zh">Rate 效应：品类内高风险成交占比的变化</span></li>
-              <li><span class="sw" style="--c:var(--mix-eff)"></span><span lang="en">Mix effect: change in the category's weight</span><span lang="zh">Mix 效应：品类权重的变化</span></li>
-            </ul>
-          </div>
-          <figcaption class="caption"><span lang="en">Illustrative data, pp = percentage points. The same numbers as the case dashboard.</span><span lang="zh">示意数据，单位 pp 为百分点；与案例页看板是同一组数字。</span> <a href="cases/prci.html#prci-dashboard-ctv"><span lang="en">See the full dashboard →</span><span lang="zh">查看完整看板 →</span></a></figcaption>
-        </figure>
-        <div class="cl-body">
-          <p class="one"><span lang="en">Fashion's high-risk share of sales turned up at the end of June 2026. I built the data in Spark SQL, sliced it six ways and used a shift-share decomposition to put the change on each category, which pointed to one category, one market and the mid-tier sellers.</span><span lang="zh">2026 年 6 月底，Fashion 的高风险成交占比往上走。我用 Spark SQL 搭数据，按六个维度切分，再用 Shift-Share 把变化落到每个品类，定位到一个主要品类、一个市场和一群中腰部卖家。</span></p>
-          <p class="legend"><span class="chip static">Spark SQL</span><span class="chip static">Python (pandas)</span><span class="chip static">Plotly</span><span class="chip static">Streamlit</span></p>
-          <p class="more"><a href="cases/prci.html#review"><span lang="en">Review an AI risk recommendation (2 min) →</span><span lang="zh">审一条 AI 风控建议（2 分钟）→</span></a><a href="cases/prci.html"><span lang="en">Read the full case →</span><span lang="zh">阅读完整案例 →</span></a></p>
         </div>
-      </li>
-    </ol>
+
+        <!-- 4. Segments -->
+        <div class="dash-panel" id="p-panel-seg" role="tabpanel" aria-labelledby="prci-dashboard-seg">
+          <div class="dash-block">
+            <div class="dash-bar">
+              <h3 class="dash-h"><span lang="en">High-risk sellers' share of each segment's GMV, before to after</span><span lang="zh">各分群内高风险卖家的成交额占比：基期 → 观察期</span></h3>
+              <div class="seg" role="group" aria-label="Segment" id="p-seg-dim">
+                <button type="button" data-v="market" aria-pressed="true"><span lang="en">Market</span><span lang="zh">市场</span></button>
+                <button type="button" data-v="managed" aria-pressed="false"><span lang="en">Managed</span><span lang="zh">托管</span></button>
+                <button type="button" data-v="tenure" aria-pressed="false"><span lang="en">Tenure</span><span lang="zh">新老卖家</span></button>
+                <button type="button" data-v="action" aria-pressed="false"><span lang="en">Actions</span><span lang="zh">处置记录</span></button>
+              </div>
+            </div>
+            <div class="chart" id="p-seg-chart"></div>
+            <p class="caption" id="p-seg-cap"></p>
+          </div>
+        </div>
+
+        <!-- 5. Category concentration -->
+        <div class="dash-panel" id="p-panel-catcon" role="tabpanel" aria-labelledby="prci-dashboard-catcon">
+          <div class="dash-block">
+            <h3 class="dash-h"><span lang="en">How concentrated high-risk GMV is across categories</span><span lang="zh">高风险成交额在品类之间有多集中</span></h3>
+            <div class="eqs" id="p-cc-eqs"></div>
+            <ul class="key">
+              <li><span class="sw" style="--c:var(--nonhr)"></span><span lang="en">Before</span><span lang="zh">基期</span></li>
+              <li><span class="sw" style="--c:var(--hr)"></span><span lang="en">After</span><span lang="zh">观察期</span></li>
+            </ul>
+            <div class="chart" id="p-cc-chart"></div>
+            <p class="caption"><span lang="en">Categories ranked by high-risk GMV within each window; the line is the running total. The illustrative set has 40 categories instead of the 1,000-plus in the real data.</span><span lang="zh">每个窗口内按高风险成交额给品类排名，折线是累计占比。示意数据只有 40 个品类，真实数据有 1,000 多个。</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Looking back -->
+    <section class="block" id="prci-learned">
+      <div class="head">
+        <p class="eyebrow"><span lang="en">Looking back</span><span lang="zh">复盘</span></p>
+        <h2><span lang="en">Split the ratio first, then decompose instead of ranking</span><span lang="zh">先拆分子分母，再用贡献分解代替排序</span></h2>
+      </div>
+      <div class="split">
+        <div class="col">
+          <h3><span lang="en">What I learned</span><span lang="zh">学到的</span></h3>
+          <p><span lang="en">The headline here was a ratio, and its numerator was actually falling. Checking both parts first stopped the analysis from chasing "more high-risk sales" that did not exist. And a small net change can hide large moves that cancel out: only an exact decomposition shows where to look first.</span><span lang="zh">这次的指标是比例，而它的分子其实在下降。先核对分子分母，分析才没有去追一个并不存在的"高风险成交额增长"。另外，很小的净变化下面，可能是一大一小相互抵消的变化；只有精确的贡献分解，才知道该先查哪里。</span></p>
+        </div>
+        <div class="col">
+          <h3><span lang="en">If I did it again</span><span lang="zh">如果重做</span></h3>
+          <ul>
+            <li><span lang="en">Use a seller × effective-week history of risk tiers, so each week carries the tier that applied then.</span><span lang="zh">用「卖家 × 生效周」的历史快照，按周取当时有效的风险等级，而不是用最新快照回填。</span></li>
+            <li><span lang="en">Make "actioned" time-aware: before the action, after it, and never; to judge effect, compare with similar sellers who were not actioned.</span><span lang="zh">以处置周为起点，把卖家分成处置前、处置后和从未处置；要评估效果，再匹配处置前风险和规模相近的对照卖家。</span></li>
+            <li><span lang="en">Automate the checks on joins, missing values and the decomposition's sum.</span><span lang="zh">把关联核对、缺失率和贡献加总校验做成自动检查。</span></li>
+            <li><span lang="en">Align the background monitoring chart with the formal analysis on market scope, denominator and definitions.</span><span lang="zh">把背景监控图和正式分析的市场范围、分母和口径统一。</span></li>
+          </ul>
+          <p class="note"><span lang="en">Tools: Spark SQL, Python (pandas), Plotly, Streamlit.</span><span lang="zh">工具：Spark SQL、Python（pandas）、Plotly、Streamlit。</span></p>
+        </div>
+      </div>
+    </section>
+
   </section>
+  <!-- ======================================================================== 项目二结束 -->
 
   <footer>
-    <span>2026</span>
-    <span><span lang="en">Plain HTML and CSS; no tracking. Charts in the cases use illustrative data.</span><span lang="zh">纯 HTML 和 CSS，不加统计代码。案例中的图表均为示意数据。</span></span>
+    <span><span lang="en">Plain HTML and CSS, no tracking. All charts and briefs use illustrative data: no internal table names, field names, seller IDs, rule thresholds or business figures.</span><span lang="zh">纯 HTML 和 CSS，不加统计代码。所有图表和简报均为示意数据，不含内部表名、字段名、卖家 ID、规则阈值和业务数值。</span></span>
   </footer>
 </main>
 
 <script src="kit.js"></script>
 <script>Kit.initToggles();</script>
 <script src="site.js"></script>
+<script src="dash-edd.js"></script>
+<script src="brief-data.js"></script>
+<script src="edd-tour.js"></script>
+<script src="edd-brief.js"></script>
 <script src="dash-prci.js"></script>
+<script src="prci-review.js"></script>
 </body>
 </html>

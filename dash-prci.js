@@ -1,12 +1,12 @@
-/* dash-prci.js · Fashion high-risk GMV mix (PRCI): the home preview [data-prci-demo] and the web dashboard
-   [data-prci-dash] on cases/prci.html. Rebuilt from the five-page dashboard delivered during the internship.
-   ONE seeded set of illustrative data feeds both, so the decomposition, tables, charts and the home preview agree.
+/* dash-prci.js · Fashion high-risk GMV mix (PRCI): the web dashboard [data-prci-dash] in the PRCI project of
+   index.html. Rebuilt from the five-page dashboard delivered during the internship.
+   ONE seeded set of illustrative data feeds it, so the decomposition, tables, charts and the review demo agree.
    None of it is real eBay data. Loaded after kit.js and site.js. */
 (function () {
   'use strict';
   if (typeof Kit === 'undefined') return;
-  const home = document.querySelector('[data-prci-demo]'), root = document.querySelector('[data-prci-dash]');
-  if (!home && !root) return;
+  const root = document.querySelector('[data-prci-dash]');
+  if (!root) return;
   const { t, L, esc, MINUS } = Kit;
   const $ = (id) => document.getElementById(id);
 
@@ -163,38 +163,6 @@
     hit.addEventListener('pointermove', show); hit.addEventListener('pointerdown', show); hit.addEventListener('pointerleave', () => Kit.tipHide(box));
   }
 
-  // ================================================================================== home preview
-  if (home) {
-    const box = home.querySelector('.chart'), eq = home.querySelector('[data-eq]'), def = home.querySelector('[data-def]');
-    const rows = [
-      { name: D.top.name, rateD: D.top.rateD, mixD: D.top.mixD, delta: D.top.delta },
-      { name: { en: 'Other categories', zh: '其余品类合计' }, rateD: D.restRate, mixD: D.restMix, delta: D.restD },
-      { name: { en: 'Overall change', zh: '整体变化' }, rateD: D.totRate, mixD: D.totMix, delta: D.total, total: true },
-    ];
-    let mode = home.dataset.mode || 'net';
-    const draw = () => {
-      contribBars(box, rows, { split: mode === 'split', rowH: 34, labW: 124, title: { en: 'Contribution to the change in the high-risk share, pp', zh: '对高风险成交占比变化的贡献（pp）' } });
-      const n = D.top.name;
-      eq.innerHTML = mode === 'split'
-        ? L({ en: `${n.en} ${sgn(D.top.delta, 2)} = rate ${sgn(D.top.rateD, 2)} + mix ${sgn(D.top.mixD, 2)} pp`, zh: `${n.zh} ${sgn(D.top.delta, 2)} = Rate ${sgn(D.top.rateD, 2)} + Mix ${sgn(D.top.mixD, 2)} pp` })
-        : L({ en: `${sgn(D.top.delta, 2)} ${sgn(D.restD, 2).replace(/^([+−])/, '$1 ')} = ${sgn(D.total, 2)} pp`, zh: `${sgn(D.top.delta, 2)} ${sgn(D.restD, 2).replace(/^([+−])/, '$1 ')} = ${sgn(D.total, 2)} pp` });
-      def.innerHTML = mode === 'split'
-        ? L({ en: `Most of ${n.en}'s push comes from high-risk sellers taking a larger share of the category's GMV (rate effect); its larger weight in Fashion adds little (mix effect).`, zh: `${n.zh}的贡献大部分来自品类内高风险卖家的成交额比重上升（Rate 效应），品类在 Fashion 里变重带来的只是一小部分（Mix 效应）。` })
-        : L({ en: `The overall share moved only ${sgn(D.total, 2)} pp, but ${n.en} alone pushed it up ${Math.abs(D.top.delta).toFixed(2)} while the other categories together pulled it back ${Math.abs(D.restD).toFixed(2)}.`, zh: `整体只变了 ${sgn(D.total, 2)} 个百分点，但${n.zh}单独推高 ${Math.abs(D.top.delta).toFixed(2)}，其余品类合计拉回 ${Math.abs(D.restD).toFixed(2)}。` });
-      home.querySelectorAll('[data-show]').forEach((el) => { el.hidden = el.dataset.show !== mode; });
-    };
-    home.querySelectorAll('button[data-mode]').forEach((b) => b.addEventListener('click', () => {
-      mode = b.dataset.mode; home.dataset.mode = mode;
-      home.querySelectorAll('button[data-mode]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      draw();
-    }));
-    let lw = 0;
-    const redraw = () => { const w = box.offsetWidth; if (w && w !== lw) { lw = w; draw(); } };
-    if ('ResizeObserver' in window) new ResizeObserver(redraw).observe(box);
-    Kit.onLang(draw); Kit.onResize(redraw); window.addEventListener('site:target', redraw);
-    redraw();
-  }
-  if (!root) return;
 
   // ================================================================================== dashboard
   const state = { cat: 'all', metric: 'inr', win: 'post', dim: 'market', hl: null };

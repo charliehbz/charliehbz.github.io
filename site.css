@@ -17,6 +17,22 @@
   --mix-eff: var(--sky);             /* mix effect: change in a category's weight */
 }
 
+/* 00. One page, two projects: the project tabs under the top bar, and which project is showing ----------
+   Project tabs are the top level (large text, underline, full-width bar); the small pills inside a case switch
+   dashboard pages. --head-h and --stick are measured by site.js. */
+.topbar .who-sub { font-size: 12.5px; color: var(--muted); margin-right: auto; }
+.topbar .who { margin-right: 0; }
+.proj-nav { position: sticky; top: var(--head-h, 0px); z-index: 4; background: var(--paper); border-bottom: 1px solid var(--rule); }
+.proj-nav .wrap { display: flex; gap: 0 32px; }
+.proj-tab { display: flex; align-items: baseline; gap: 7px; padding: 12px 2px 10px; border-bottom: 3px solid transparent; margin-bottom: -1px; text-decoration: none; color: var(--muted); }
+.proj-tab .pt-k { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; }
+.proj-tab .pt-n { font-size: 16px; font-weight: 700; }
+.proj-tab:hover { color: var(--ink); }
+.proj-tab[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+html[data-proj="edd"] [data-project="prci"], html[data-proj="prci"] [data-project="edd"] { display: none; }
+section.block, .tour, .rv-final, .ev-banner, .dash-block { scroll-margin-top: var(--stick, 72px); }
+[data-dash] [role="tab"] { scroll-margin-top: calc(var(--stick, 72px) + 140px); }
+
 /* A. Breadcrumb on case pages ----------------------------------------------------------------- */
 .crumbs { display: flex; flex-wrap: wrap; gap: 4px 8px; padding-top: 16px; font-size: 13px; color: var(--muted); }
 .crumbs a { color: var(--muted); }
@@ -86,7 +102,6 @@
 
 /* F. Case page: the web version of the dashboard ---------------------------------------------- */
 .dash { display: flex; flex-direction: column; gap: 16px; }
-[data-dash] [role="tab"] { scroll-margin-top: 210px; }   /* a link to a tab lands with the section heading and tabs in view */
 .dash .table-wrap { margin-top: 4px; }
 .prci-demo .cov-eq { font-size: 22px; }
 .chip-pick { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -134,7 +149,7 @@ details.why p { color: var(--muted); max-width: 88ch; }
 .tour-go:hover { filter: brightness(1.08); }
 .tour-go .arr { font-size: 17px; }
 .tour-go.small, .brief-go.small { padding: 6px 14px; font-size: 13.5px; }
-.tour { scroll-margin-top: 72px; border: 1.5px solid var(--adopt); border-radius: 12px; background: var(--panel); padding: 16px 18px; margin-block: 14px; display: flex; flex-direction: column; gap: 10px; font-size: 14.5px; max-width: 100%; }
+.tour { border: 1.5px solid var(--adopt); border-radius: 12px; background: var(--panel); padding: 16px 18px; margin-block: 14px; display: flex; flex-direction: column; gap: 10px; font-size: 14.5px; max-width: 100%; }
 .tour-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
 .tour-k { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--adopt); }
 .tour-sc { font-size: 13px; color: var(--muted); }
@@ -229,12 +244,12 @@ details.how[open] > summary { margin-bottom: 10px; }
 .rv-chip { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 0 7px; border-radius: 999px; background: var(--panel-2); color: var(--ink); vertical-align: 1px; }
 .rv-quote { margin: 0; border-left: 3px solid var(--ink); padding: 2px 0 2px 12px; font-size: 16px; font-weight: 600; }
 .rv-sup { background: var(--paper); border-radius: 8px; padding: 8px 12px; border: 1px solid var(--rule); }
-.rv-final { border: 1.5px solid var(--ink); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; scroll-margin-top: 72px; }
+.rv-final { border: 1.5px solid var(--ink); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
 .rv-out { display: flex; flex-direction: column; gap: 8px; font-size: 15px; max-width: 92ch; }
 .rv-tag { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 0 8px; border-radius: 999px; border: 1px solid var(--ink); margin-right: 4px; vertical-align: 1px; }
 .rv-h { font-size: 14px; font-weight: 700; margin: 6px 0 0; }
 .rv-inputs dd { font-size: 13.5px; }
-.ev-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; background: var(--shade); border-radius: 8px; padding: 8px 12px; font-size: 13.5px; scroll-margin-top: 72px; }
+.ev-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; background: var(--shade); border-radius: 8px; padding: 8px 12px; font-size: 13.5px; }
 .ev-banner p { flex: 1 1 320px; }
 [data-prci-dash] .dash-block.is-focus { box-shadow: inset 3px 0 0 var(--ink); }
 .ctv-note, .missing { background: var(--panel); border-radius: 10px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; max-width: 96ch; }
@@ -249,6 +264,8 @@ details.how[open] > summary { margin-bottom: 10px; }
 
 /* G. Responsive ------------------------------------------------------------------------------- */
 @media (max-width: 900px) {
+  .topbar .who-sub { display: none; }
+  .topbar .who { margin-right: auto; }
   .case-list > li { grid-template-columns: minmax(0, 1fr); }
   .case-list > li.has-shot { grid-template-columns: minmax(0, 1fr); grid-template-areas: "meta" "shot" "body"; grid-template-rows: none; }
   .dash-grid2 { grid-template-columns: minmax(0, 1fr); }
@@ -257,6 +274,12 @@ details.how[open] > summary { margin-bottom: 10px; }
   .how-grid, .own { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 560px) {
+  /* project tabs: two equal halves, the short name above the long one, so both stay readable */
+  .proj-nav .wrap { gap: 0 14px; }
+  .proj-tab { flex: 1 1 0; flex-direction: column; align-items: flex-start; gap: 1px; padding: 8px 2px 7px; min-width: 0; }
+  .proj-tab .pt-dot { display: none; }
+  .proj-tab .pt-k { font-size: 12px; }
+  .proj-tab .pt-n { font-size: 14px; line-height: 1.3; }
   /* long metric labels ("Item-not-received rate · guardrail") would squeeze the text column: put the label above */
   .facts.wide { grid-template-columns: minmax(0, 1fr); gap: 2px 0; }
   .facts.wide dd { margin-bottom: 12px; }

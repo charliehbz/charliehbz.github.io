@@ -1,4 +1,4 @@
-/* edd-brief.js · the "draft this week's rollout brief with AI" prototype on cases/ebay-edd.html (a portfolio extension,
+/* edd-brief.js · the "draft this week's rollout brief with AI" prototype in the EDD project of index.html (a portfolio extension,
    not part of the internship deliverable).
    Flow: the reader picks a shipping option and a 4-week window (the same filter as the dashboard) → EDD.briefInput()
    (dash-edd.js) works out every metric, change, denominator and maturity status → a language model turns that
