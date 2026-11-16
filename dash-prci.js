@@ -72,7 +72,7 @@
     D.other = { name: { en: 'Other 28 categories', zh: '其余 28 个品类' }, mixPre: Gp / GPRE, mixPost: Gq / GPOST, ratePre: Hp / Gp, ratePost: Hq / Gq, rateD: rate, mixD: r2(delta - rate), delta, isOther: true };
   }
   D.all = D.rows.concat([D.other]);
-  for (const r of D.all) r.ctv = (r.delta / D.total) * 100;
+  for (const r of D.all) { r.ctv = (r.delta / D.total) * 100; r.hrPost = (r.mixPost * r.ratePost) / RPOST; }   // hrPost: share of Fashion's high-risk GMV, after
   D.top = D.rows.slice().sort((a, b) => b.delta - a.delta)[0];   // the biggest push upwards
   const rest = D.all.filter((r) => r !== D.top);
   D.restD = r2(D.total - D.top.delta); D.restRate = r2(sum(rest.map((r) => r.rateD))); D.restMix = r2(D.restD - D.restRate);
@@ -86,9 +86,9 @@
   // Segments: shares of Fashion GMV are set; the last segment's rate is solved so each window adds up to the overall share.
   const DIMS = {
     market: { label: { en: 'Market', zh: '市场' }, segs: [{ en: 'HIPO', zh: 'HIPO' }, { en: 'IN', zh: 'IN' }, { en: 'SEA', zh: 'SEA' }], s: [[0.45, 0.19, 0.36], [0.47, 0.18, 0.35]], r: [[0.160, 0.070], [0.172, 0.066]],
-      cap: { en: 'HIPO is the only market whose own high-risk share rose.', zh: 'HIPO 是唯一一个内部高风险占比上升的市场。' } },
+      cap: { en: "HIPO is the only market where high-risk sellers' share of its GMV rose.", zh: 'HIPO 是唯一一个高风险卖家成交额比重上升的市场。' } },
     managed: { label: { en: 'Managed', zh: '托管' }, segs: [{ en: 'Managed', zh: '托管卖家' }, { en: 'Unmanaged', zh: '非托管卖家' }], s: [[0.38, 0.62], [0.39, 0.61]], r: [[0.025], [0.025]],
-      cap: { en: 'Unmanaged sellers carry a far higher share than managed ones.', zh: '非托管卖家的高风险占比远高于托管卖家。' } },
+      cap: { en: 'Among unmanaged sellers, high-risk sellers account for a far larger share of GMV than among managed ones.', zh: '非托管卖家里，高风险卖家的成交额比重远高于托管卖家。' } },
     tenure: { label: { en: 'Tenure', zh: '新老卖家' }, segs: [{ en: 'New sellers', zh: '新卖家' }, { en: 'Existing sellers', zh: '老卖家' }], s: [[0.12, 0.88], [0.12, 0.88]], r: [[0.150], [0.130]],
       cap: { en: 'Existing sellers moved up while new sellers moved down.', zh: '老卖家上升，新卖家下降。' } },
     action: { label: { en: 'Actions', zh: '处置记录' }, segs: [{ en: 'Ever actioned', zh: '曾被处置' }, { en: 'Never actioned', zh: '从未处置' }], s: [[0.08, 0.92], [0.08, 0.92]], r: [[0.270], [0.285]],
@@ -128,6 +128,10 @@
     let g = `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="${esc(t(o.title))}">`;
     for (const v of Kit.ticks(lo, hi, W < 480 ? 3 : 5).out) g += `<line class="gridline" x1="${sx(v)}" x2="${sx(v)}" y1="18" y2="${H - 4}"/><text x="${sx(v)}" y="11" text-anchor="middle">${sgn(v, 1)}</text>`;
     g += `<line class="zero" x1="${sx(0)}" x2="${sx(0)}" y1="18" y2="${H - 4}"/>`;
+    if (o.hl) rows.forEach((r, j) => {   // o.hl: 'top' outlines the biggest push and shades the rows pulling down; 'note' outlines the push only
+      const y = 26 + j * rowH + rowH / 2 - 4, cls = r === D.top ? 'row-hl' : o.hl === 'top' && !r.total && r.delta < 0 ? 'row-off' : '';
+      if (cls) g += `<rect class="${cls}" x="1" y="${(y - rowH / 2 + 1).toFixed(1)}" width="${W - 2}" height="${rowH - 2}" rx="4"/>`;
+    });
     rows.forEach((r, j) => {
       const y = 26 + j * rowH + rowH / 2 - 4;
       if (r.total) g += `<line class="gridline" x1="0" x2="${W}" y1="${y - rowH / 2}" y2="${y - rowH / 2}"/>`;
@@ -175,7 +179,7 @@
         ? L({ en: `${n.en} ${sgn(D.top.delta, 2)} = rate ${sgn(D.top.rateD, 2)} + mix ${sgn(D.top.mixD, 2)} pp`, zh: `${n.zh} ${sgn(D.top.delta, 2)} = Rate ${sgn(D.top.rateD, 2)} + Mix ${sgn(D.top.mixD, 2)} pp` })
         : L({ en: `${sgn(D.top.delta, 2)} ${sgn(D.restD, 2).replace(/^([+−])/, '$1 ')} = ${sgn(D.total, 2)} pp`, zh: `${sgn(D.top.delta, 2)} ${sgn(D.restD, 2).replace(/^([+−])/, '$1 ')} = ${sgn(D.total, 2)} pp` });
       def.innerHTML = mode === 'split'
-        ? L({ en: `Most of ${n.en}'s push comes from a higher high-risk share inside the category (rate effect); its larger weight in Fashion adds little (mix effect).`, zh: `${n.zh}的贡献大部分来自品类内部高风险卖家占比上升（Rate 效应），品类在 Fashion 里变重带来的只是一小部分（Mix 效应）。` })
+        ? L({ en: `Most of ${n.en}'s push comes from high-risk sellers taking a larger share of the category's GMV (rate effect); its larger weight in Fashion adds little (mix effect).`, zh: `${n.zh}的贡献大部分来自品类内高风险卖家的成交额比重上升（Rate 效应），品类在 Fashion 里变重带来的只是一小部分（Mix 效应）。` })
         : L({ en: `The overall share moved only ${sgn(D.total, 2)} pp, but ${n.en} alone pushed it up ${Math.abs(D.top.delta).toFixed(2)} while the other categories together pulled it back ${Math.abs(D.restD).toFixed(2)}.`, zh: `整体只变了 ${sgn(D.total, 2)} 个百分点，但${n.zh}单独推高 ${Math.abs(D.top.delta).toFixed(2)}，其余品类合计拉回 ${Math.abs(D.restD).toFixed(2)}。` });
       home.querySelectorAll('[data-show]').forEach((el) => { el.hidden = el.dataset.show !== mode; });
     };
@@ -193,7 +197,7 @@
   if (!root) return;
 
   // ================================================================================== dashboard
-  const state = { cat: 'all', metric: 'inr', win: 'post', dim: 'market' };
+  const state = { cat: 'all', metric: 'inr', win: 'post', dim: 'market', hl: null };
   const SHADE_WIN = [{ x0: 48.5, x1: 54.5, label: { en: 'Windows', zh: '前后窗口' } }];
   const pct = (d) => (v) => (v * 100).toFixed(d) + '%';
 
@@ -222,7 +226,7 @@
       + `<p class="eq"><span class="k">${L({ en: 'Numerator and denominator', zh: '分子和分母' })}</span><span class="v">${L({ en: 'high-risk GMV', zh: '高风险成交额' })} <b>${sgn(D.hrChg, 1)}%</b> · ${L({ en: 'all Fashion GMV', zh: '全部成交额' })} <b>${sgn(D.gmvChg, 1)}%</b></span></p>`;
     const rows = D.all.slice().sort((a, b) => (a.isOther ? 1 : b.isOther ? -1 : b.delta - a.delta));
     rows.push({ name: { en: 'Overall change', zh: '整体变化' }, rateD: D.totRate, mixD: D.totMix, delta: D.total, total: true });
-    contribBars($('p-ctv-bars'), rows, { split: true, title: { en: 'Contribution of each category to the change, pp', zh: '各品类对整体变化的贡献（pp）' } });
+    contribBars($('p-ctv-bars'), rows, { split: true, hl: state.hl === 'top' || state.hl === 'note' ? state.hl : null, title: { en: 'Contribution of each category to the change, pp', zh: '各品类对整体变化的贡献（pp）' } });
     const p1 = (v) => (v * 100).toFixed(1) + '%';
     Kit.table($('p-ctv-table'), {
       sortKey: 'delta', sortDir: 'desc',
@@ -230,8 +234,9 @@
         { key: 'name', label: { en: 'Category', zh: '品类' }, align: 'l', html: (r) => L(r.name), pri: 1 },
         { key: 'mixPre', label: { en: 'GMV weight, before', zh: '成交额权重 · 基期' }, fmt: p1, pri: 3 },
         { key: 'mixPost', label: { en: 'GMV weight, after', zh: '成交额权重 · 观察期' }, fmt: p1, pri: 3 },
-        { key: 'ratePre', label: { en: 'High-risk share, before', zh: '高风险占比 · 基期' }, fmt: p1, pri: 2 },
-        { key: 'ratePost', label: { en: 'High-risk share, after', zh: '高风险占比 · 观察期' }, fmt: p1, pri: 2 },
+        { key: 'ratePre', label: { en: 'High-risk share of its GMV, before', zh: '品类内高风险成交占比 · 基期' }, fmt: p1, pri: 2 },
+        { key: 'ratePost', label: { en: 'High-risk share of its GMV, after', zh: '品类内高风险成交占比 · 观察期' }, fmt: p1, pri: 2 },
+        { key: 'hrPost', label: { en: "Share of Fashion's high-risk GMV, after", zh: '占 Fashion 高风险成交额 · 观察期' }, fmt: p1, pri: 2 },
         { key: 'rateD', label: { en: 'Rate effect, pp', zh: 'Rate 效应 pp' }, fmt: (v) => sgn(v, 2), pri: 2 },
         { key: 'mixD', label: { en: 'Mix effect, pp', zh: 'Mix 效应 pp' }, fmt: (v) => sgn(v, 2), pri: 3 },
         { key: 'delta', label: { en: 'Total, pp', zh: '合计 pp' }, fmt: (v) => sgn(v, 2), tone: 'low', pri: 1 },
@@ -239,6 +244,7 @@
       ],
       rows: D.all.map((r) => Object.assign({}, r)),
     });
+    if (state.hl === 'top' || state.hl === 'note') $('p-ctv-table').querySelectorAll('tbody tr').forEach((tr) => { if (tr.textContent.includes(D.top.name.en)) tr.classList.add('hl'); });
   }
 
   function drawSeller() {
@@ -274,9 +280,9 @@
     Kit.dumbbell($('p-seg-chart'), {
       rows, aName: { en: 'Before', zh: '基期' }, bName: { en: 'After', zh: '观察期' },
       fmt: (v) => v.toFixed(1) + '%', dfmt: (v) => v.toFixed(1) + ' pp', better: 'lower', domain: [0, Math.ceil(Math.max(...all) * 1.12)],
-      title: { en: 'High-risk share within each segment, before to after', zh: '各分群内部的高风险占比：基期 → 观察期' },
+      title: { en: "High-risk sellers' share of each segment's GMV, before to after", zh: '各分群内高风险卖家的成交额占比：基期 → 观察期' },
     });
-    $('p-seg-cap').innerHTML = L({ en: d.cap.en + ' These are shares within each segment; a segment\'s weight in Fashion also moves, so a change here is not its contribution to the overall change.', zh: d.cap.zh + '这些是各分群内部的占比；分群在 Fashion 里的权重也在变，所以这里的变化不等于它对整体变化的贡献。' });
+    $('p-seg-cap').innerHTML = L({ en: d.cap.en + ' These are GMV shares within each segment, not seller counts; a segment\'s weight in Fashion also moves, so a change here is not its contribution to the overall change.', zh: d.cap.zh + '这些是各分群内按成交额计算的占比，不是卖家人数；分群在 Fashion 里的权重也在变，所以这里的变化不等于它对整体变化的贡献。' });
   }
 
   function drawCatcon() {
@@ -316,4 +322,30 @@
   root.querySelectorAll('[role="tab"]').forEach((b) => b.addEventListener('click', () => redrawAll()));
   window.addEventListener('site:target', () => redrawAll());
   redrawAll();
+
+  // ---------------------------------------------------------------------------------- evidence links (prci-review.js)
+  // show(key) opens the right tab, sets the highlight and returns the block to scroll to; clear() undoes it.
+  const EVID = {
+    'ctv-top': { tab: 'prci-dashboard-ctv', panel: 'p-panel-ctv', block: 'p-ctv-blk', hl: 'top' },
+    'ctv-note': { tab: 'prci-dashboard-ctv', panel: 'p-panel-ctv', block: 'p-ctv-blk', hl: 'note', mark: 'p-ctv-note' },
+    'seller-scope': { tab: 'prci-dashboard-seller', panel: 'p-panel-seller', block: 'p-sel-blk', hl: 'scope', mark: 'p-sel-missing' },
+  };
+  const unmark = () => root.querySelectorAll('.is-focus, .is-hl').forEach((e) => e.classList.remove('is-focus', 'is-hl'));
+  window.PRCI = Object.assign({}, window.PRCI_DATA, {
+    show(key) {
+      const c = EVID[key];
+      if (!c) return null;
+      unmark();
+      state.hl = c.hl;
+      if (c.hl === 'scope' && state.win !== 'post') { state.win = 'post'; $('p-sel-win').querySelectorAll('button[data-v]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === 'post'))); }
+      const tab = $(c.tab);
+      if (tab.getAttribute('aria-selected') !== 'true') tab.click();
+      redraw(PANELS.find((p) => p.el.id === c.panel), true);
+      $(c.block).classList.add('is-focus');
+      if (c.mark) $(c.mark).classList.add('is-hl');
+      if (c.hl === 'scope') $('p-sel-scope').classList.add('is-hl');
+      return $(c.block);
+    },
+    clear() { state.hl = null; unmark(); redrawAll(true); },
+  });
 })();

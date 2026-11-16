@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="../site.css">
 <!--
   案例页：Fashion PRCI 高风险成交占比异动。事实来自个人复盘文档；公开版不写内部表名、卖家 ID、规则阈值和业务数值。
-  看板由 ../dash-prci.js 用一套示意数据画出。每段可见文字都是 en / zh 一对。
+  看板由 ../dash-prci.js 用一套示意数据画出；首屏的 AI 建议审核演示由 ../prci-review.js 驱动（作品集扩展，判断为预设，不调用模型）。每段可见文字都是 en / zh 一对。
 -->
 </head>
 <body>
@@ -54,8 +54,61 @@
   <div class="masthead">
     <p class="eyebrow"><span lang="en">eBay · Trust and risk · Internship project</span><span lang="zh">eBay · 交易风险 · 实习项目</span></p>
     <h1><span lang="en">eBay trust and risk: the high-risk share of Fashion sales rose. What pushed it up?</span><span lang="zh">eBay 交易风险｜高风险成交占比上升，是谁推高的？</span></h1>
-    <p class="lede"><span lang="en">The high-risk share (High Risk GMV Mix) is the part of Fashion's sales (GMV) that comes from high-risk sellers; a seller's risk tier comes from the team's PRCI tiering (high, medium, low). At the end of June 2026 this share turned up again. I built the data from transaction detail, split the change by category, seller and market, and used a shift-share decomposition to assign it to each category, to find what was pushing it up.</span><span lang="zh">高风险成交占比（High Risk GMV Mix）是 Fashion 总成交额（GMV）中来自高风险卖家的比例；卖家的风险等级来自团队的 PRCI 分层（高、中、低三档）。2026 年 6 月底，这个比例又往上走了。我从交易明细搭数据，按品类、卖家和市场拆开，再用 Shift-Share 把整体变化分到每个品类，找出是谁在推高它。</span></p>
+    <p class="lede"><span lang="en">During my eBay internship, Fashion's high-risk share of sales turned up again at the end of June 2026. I built the data from transaction detail, used a shift-share decomposition to assign the change to each category, and delivered a five-page dashboard; risk strategy and actions belong to the team.</span><span lang="zh">在 eBay 实习时，Fashion 的高风险成交占比在 2026 年 6 月底再次上行。我从交易明细搭数据，用 Shift-Share 把变化分到每个品类，并交付了五页看板；风险策略和具体处置由团队负责。</span></p>
+    <div class="tour-cta" id="review-cta">
+      <a class="tour-go" href="#review" data-review-start><span lang="en">Can this risk recommendation go to the strategy team?</span><span lang="zh">这条风控建议，可以发给策略团队吗？</span><span class="arr" aria-hidden="true">→</span></a>
+      <p class="note"><span lang="en"><b>AI recommendation review demo</b> · the draft is a hand-built test case; the charts use illustrative data. About 2 minutes, three sentences.</span><span lang="zh"><b>AI 建议审核演示</b> · 草稿为人工构造的测试样例，图表使用示意数据。约 2 分钟，逐句审 3 句。</span></p>
+    </div>
+    <p class="lede-sm"><span lang="en">The high-risk share (High Risk GMV Mix) is the part of Fashion's sales (GMV) that comes from high-risk sellers. A seller's risk tier comes from the team's PRCI tiering (high, medium, low), taken from the latest snapshot when the data was pulled.</span><span lang="zh">高风险成交占比（High Risk GMV Mix）是 Fashion 总成交额（GMV）中来自高风险卖家的比例。卖家的风险等级来自团队的 PRCI 分层（高、中、低三档），取跑表时的最新快照。</span></p>
   </div>
+
+  <!-- 0. The review demo: a hand-built AI draft, judged sentence by sentence against the dashboard below (../prci-review.js).
+       Designed for the portfolio after the internship; the judgements are preset, no model is called. -->
+  <section class="block" id="review">
+    <div class="head">
+      <p class="eyebrow"><span lang="en">AI recommendation review demo · portfolio extension</span><span lang="zh">AI 建议审核演示 · 作品集扩展</span></p>
+      <h2><span lang="en">Can this risk recommendation go to the strategy team?</span><span lang="zh">这条风控建议，可以发给策略团队吗？</span></h2>
+      <p class="dek"><span lang="en">An AI assistant drafted the paragraph below from this page's dashboard. For each sentence, decide: keep, rewrite, or needs more data. Then open the evidence and check.</span><span lang="zh">假设一个 AI 助手根据本页看板起草了下面这段建议。逐句判断「可保留」「需改写」还是「需补数据」，再打开对应的证据核对。</span></p>
+    </div>
+    <dl class="own">
+      <div><dt><span lang="en">Delivered during the internship</span><span lang="zh">实习期间实际交付</span></dt><dd><span lang="en">The data analysis, the contribution decomposition and the five-page dashboard. Risk strategy and actions belong to the team.</span><span lang="zh">数据分析、贡献分解和五页看板。风险策略和具体处置由团队负责。</span></dd></div>
+      <div><dt><span lang="en">Designed afterwards for this portfolio</span><span lang="zh">实习结束后为作品集设计</span></dt><dd><span lang="en">This review experience. The draft is a test case I wrote by hand, not model output and not a real team recommendation; the judgements and reasons are preset, and the charts use illustrative data.</span><span lang="zh">这个审核体验。草稿是我人工构造的测试样例，不是模型输出，也不是团队的真实建议；判断和依据是预设的，图表使用示意数据。</span></dd></div>
+    </dl>
+    <div class="rv" id="rv">
+      <div class="rv-draft" id="rv-draft"></div>
+      <aside class="tour rv-card" id="rv-card" aria-live="polite"></aside>
+      <div class="rv-final" id="rv-final" hidden></div>
+    </div>
+    <noscript><p class="note">The review needs JavaScript. 审核演示需要启用 JavaScript。</p></noscript>
+
+    <details class="how" id="rv-accept">
+      <summary><span lang="en">How I would accept this AI feature</span><span lang="zh">我会怎样验收这个 AI 功能</span></summary>
+      <p class="brief-mode"><span lang="en">How this demo works: the three judgements and their reasons are written in advance; no model is called. What follows is the acceptance design for a real version. It has not been run against a model, so there are no model test results here.</span><span lang="zh">演示方式：三句的判断和依据是预先写好的，没有调用模型。下面是真实版本的验收设计，还没有用模型跑过，所以这里没有模型测试结果。</span></p>
+      <h4 class="rv-h"><span lang="en">The smallest test pair</span><span lang="zh">最小测试对</span></h4>
+      <div class="table-wrap"><table class="ev-table">
+        <thead><tr><th><span lang="en">Claim to review</span><span lang="zh">待审核的说法</span></th><th><span lang="en">Expected judgement</span><span lang="zh">期望判断</span></th><th><span lang="en">Why</span><span lang="zh">理由</span></th></tr></thead>
+        <tbody>
+          <tr><td><b><span lang="en">"High-risk sellers' share of GMV rose."</span><span lang="zh">「高风险卖家的成交额占比上升。」</span></b></td><td><span lang="en">Supported by current data</span><span lang="zh">有现有数据支撑</span></td><td><span lang="en">The metric is exactly this: high-risk sellers' GMV ÷ all Fashion GMV. Evidence: the contributions page and the category trend.</span><span lang="zh">指标本身就是它：高风险卖家成交额 ÷ Fashion 总成交额。证据：贡献分解页、品类趋势页。</span></td></tr>
+          <tr><td><b><span lang="en">"High-risk sellers' share of sellers rose."</span><span lang="zh">「高风险卖家的人数占比上升。」</span></b></td><td><span lang="en">Not supported yet: needs data</span><span lang="zh">现有数据不支撑，需补数据</span></td><td><span lang="en">Missing: a seller-count denominator (sellers active in each window), and risk tiers as they applied each week. Today's tiers are the latest snapshot, applied to every past week.</span><span lang="zh">缺两项：按卖家计数的分母（各窗口的在售卖家数），以及每周当时生效的风险等级。现有标签是跑表时的最新快照，回填到所有历史周。</span></td></tr>
+        </tbody>
+      </table></div>
+      <h4 class="rv-h"><span lang="en">Pass criteria (design)</span><span lang="zh">验收标准（设计方案）</span></h4>
+      <ol class="how-why">
+        <li><span lang="en">Both claims get the right judgement, and the second is never "fixed" into a number the data cannot give.</span><span lang="zh">两句都判断正确；第二句不能被改写成一个数据给不出的数字。</span></li>
+        <li><span lang="en">For the unsupported claim, the review names what is missing (the denominator, the scope or the label timing), not just "not enough data".</span><span lang="zh">对不支撑的那句，要说出具体缺哪一项（分母、范围还是标签时间），而不是笼统地说"数据不足"。</span></li>
+        <li><span lang="en">Every judgement points to one evidence chart, or says plainly that no chart covers it.</span><span lang="zh">每个判断都指向一张证据图；没有对应的图，就明确说没有。</span></li>
+        <li><span lang="en">Rewording does not change the verdict ("more high-risk sellers" fails like "a higher count share"; "high-risk sellers' sales weigh more" passes like "a higher GMV share").</span><span lang="zh">换个说法结论不变：「高风险卖家变多了」和「人数占比上升」一样不通过，「高风险卖家的销售额比重提高」和「成交额占比上升」一样通过。</span></li>
+        <li><span lang="en">It never proposes whom to act on; that decision stays with the strategy team.</span><span lang="zh">不提出具体处置对象；这个决定留给策略团队。</span></li>
+      </ol>
+      <h4 class="rv-h"><span lang="en">What the review needs to be given, for every claim</span><span lang="zh">审核时要一并传入的四项信息</span></h4>
+      <dl class="defs four rv-inputs">
+        <div><dt><span lang="en">Denominator</span><span lang="zh">指标分母</span></dt><dd><span lang="en">All Fashion GMV (inside a category: that category's GMV). GMV, not sellers.</span><span lang="zh">Fashion 总成交额（品类内为该品类的成交额）。按成交额，不按卖家数。</span></dd></div>
+        <div><dt><span lang="en">Scope</span><span lang="zh">分析范围</span></dt><dd><span lang="en">Fashion, before Jun 7–21 vs after Jun 28–Jul 12; seller concentration exists only for Fashion as a whole.</span><span lang="zh">Fashion；基期 6/7–6/21 对观察期 6/28–7/12；卖家集中度只有 Fashion 整体。</span></dd></div>
+        <div><dt><span lang="en">Label timing</span><span lang="zh">标签取值时间</span></dt><dd><span lang="en">Risk tiers from the latest snapshot when the data was pulled, applied to every past week.</span><span lang="zh">风险等级取跑表时的最新快照，回填到所有历史周。</span></dd></div>
+        <div><dt><span lang="en">Evidence chart</span><span lang="zh">对应证据图表</span></dt><dd><span lang="en">The dashboard page and chart behind each number, e.g. contributions (CTV), seller concentration (Fashion only).</span><span lang="zh">每个数字背后的看板页和图，例如贡献分解（CTV）、卖家集中度（仅 Fashion 整体）。</span></dd></div>
+      </dl>
+    </details>
+  </section>
 
   <!-- 1. My part, first -->
   <section class="block" id="role">
@@ -100,13 +153,13 @@
     <div class="split">
       <div class="col">
         <p><span lang="en">The high-risk share = high-risk sellers' GMV ÷ all Fashion GMV. As a ratio it can rise because the top grows or because the bottom shrinks. Checking both showed that high-risk GMV itself fell between the two windows; all Fashion GMV fell faster, so the share edged up.</span><span lang="zh">高风险成交占比 = 高风险卖家成交额 ÷ Fashion 总成交额。它是比例，上涨可能来自分子变大，也可能来自分母变小。核验后发现，两个窗口之间高风险成交额本身是下降的，只是 Fashion 总成交额降得更多，比例才小幅上升。</span></p>
-        <p><span lang="en">Ranking categories by how much they moved cannot tell a category that got riskier from one that simply got bigger, and a small category's big swing can matter less than a large category's small one. So the overall share is written as a sum over categories, and its change is split exactly.</span><span lang="zh">只按各品类的涨跌排序，分不清是品类内部变得更"高风险"，还是品类只是变重了；小品类的大幅波动，也可能比不上大品类的小幅变化。所以把整体占比写成各品类之和，再把它的变化精确拆开。</span></p>
+        <p><span lang="en">Ranking categories by how much they moved cannot tell whether high-risk sellers took a larger share of a category's sales or the category simply got bigger, and a small category's big swing can matter less than a large category's small one. So the overall share is written as a sum over categories, and its change is split exactly.</span><span lang="zh">只按各品类的涨跌排序，分不清是品类里高风险卖家的成交额比重变大了，还是品类只是变重了；小品类的大幅波动，也可能比不上大品类的小幅变化。所以把整体占比写成各品类之和，再把它的变化精确拆开。</span></p>
       </div>
       <dl class="facts">
         <dt><span lang="en">Overall share</span><span lang="zh">整体占比</span></dt>
-        <dd><span lang="en">R = Σ (category's weight in Fashion GMV × category's high-risk share).</span><span lang="zh">R = Σ（品类在 Fashion 成交额中的权重 × 品类内部的高风险占比）。</span></dd>
+        <dd><span lang="en">R = Σ (category's weight in Fashion GMV × the share of the category's GMV from high-risk sellers).</span><span lang="zh">R = Σ（品类在 Fashion 成交额中的权重 × 品类内高风险卖家的成交额占比）。</span></dd>
         <dt><span lang="en">Rate effect</span><span lang="zh">Rate 效应</span></dt>
-        <dd><span lang="en">Change in the category's own high-risk share × its weight after. Did the category itself get riskier?</span><span lang="zh">品类内部高风险占比的变化 × 观察期的品类权重。回答"这个品类自己变得更'高风险'了吗"。</span></dd>
+        <dd><span lang="en">Change in the share of the category's GMV from high-risk sellers × its weight after. Did today's high-risk sellers take a larger share of the category's sales? It is a GMV share: it says nothing about how many sellers are high-risk, or when any seller's tier changed.</span><span lang="zh">品类内高风险卖家成交额占比的变化 × 观察期的品类权重。回答「在这个品类里，当前被标为高风险的卖家，成交额比重有没有变大」。它按成交额计算，说明不了高风险卖家有多少个，也说明不了谁在什么时候变更了等级。</span></dd>
         <dt><span lang="en">Mix effect</span><span lang="zh">Mix 效应</span></dt>
         <dd><span lang="en">Change in the category's weight × (its share before − the overall share before). Did an above-average category get heavier?</span><span lang="zh">品类权重的变化 ×（该品类基期占比 − 整体基期占比）。回答"一个高于平均的品类，是不是在整体里变重了"。</span></dd>
         <dt><span lang="en">CTV</span><span lang="zh">CTV</span></dt>
@@ -128,9 +181,9 @@
       <div class="col">
         <h3><span lang="en">What the analysis found</span><span lang="zh">定位到了什么</span></h3>
         <ul>
-          <li><span lang="en">The late-June rise was driven mainly by Men's Shoes, and mostly by a higher high-risk share inside the category (rate effect) rather than by Men's Shoes getting heavier. Other categories pulled the other way, so the overall share rose only a little.</span><span lang="zh">6 月底的上行主要由男鞋推动，而且主要来自男鞋内部高风险卖家占比上升（Rate 效应），而不是男鞋在 Fashion 里变重。其他品类有明显的反向抵消，所以整体只小幅上升。</span></li>
-          <li><span lang="en">The largest high-risk category by volume is Men's Clothing; this time it was among the categories pulling the share down.</span><span lang="zh">体量最大的高风险品类是男装；这一次它属于往下拉的品类。</span></li>
-          <li><span lang="en">By market, HIPO was the only one whose own high-risk share rose.</span><span lang="zh">按市场看，HIPO 是唯一内部高风险占比上升的市场。</span></li>
+          <li><span lang="en">The late-June rise was driven mainly by Men's Shoes, and mostly by high-risk sellers taking a larger share of the category's GMV (rate effect) rather than by Men's Shoes getting heavier. Other categories pulled the other way, so the overall share rose only a little.</span><span lang="zh">6 月底的上行主要由男鞋推动，而且主要来自男鞋品类内高风险卖家的成交额比重上升（Rate 效应），而不是男鞋在 Fashion 里变重。其他品类有明显的反向抵消，所以整体只小幅上升。</span></li>
+          <li><span lang="en">The category with the most high-risk GMV is Men's Clothing; this time it was among the categories pulling the share down. "Contributed most to the change" and "has the most high-risk GMV" are different things.</span><span lang="zh">高风险成交额最大的品类是男装；这一次它属于往下拉的品类。「对这次变化贡献最大」和「高风险成交额体量最大」是两回事。</span></li>
+          <li><span lang="en">By market, HIPO was the only one where high-risk sellers' share of its GMV rose.</span><span lang="zh">按市场看，HIPO 是唯一一个高风险卖家成交额比重上升的市场。</span></li>
           <li><span lang="en">High-risk GMV is not concentrated at the top: the top 10 sellers hold a small part, and the largest bucket is sellers ranked 101–500.</span><span lang="zh">高风险成交额并不集中在头部：前 10 名卖家只占一小部分，占比最大的一组是排名 101–500 的中腰部卖家。</span></li>
           <li><span lang="en">Ever-actioned, existing and unmanaged sellers show patterns worth watching, but explaining them needs time-aware labels or a comparison group.</span><span lang="zh">曾被处置、老卖家和非托管卖家呈现值得持续关注的特征，但要解释原因，需要按时间区分的标签或对照分析。</span></li>
         </ul>
@@ -208,7 +261,7 @@
 
       <!-- 2. Contributions -->
       <div class="dash-panel" id="p-panel-ctv" role="tabpanel" aria-labelledby="prci-dashboard-ctv">
-        <div class="dash-block">
+        <div class="dash-block" id="p-ctv-blk">
           <div class="eqs" id="p-ctv-eqs"></div>
           <div class="dash-bar">
             <h3 class="dash-h"><span lang="en">Each category's contribution to the change, pp</span><span lang="zh">各品类对整体变化的贡献（pp）</span></h3>
@@ -219,6 +272,14 @@
             </ul>
           </div>
           <div class="chart" id="p-ctv-bars"></div>
+          <div class="ctv-note" id="p-ctv-note">
+            <p class="tb-k"><span lang="en">Reading the rate effect</span><span lang="zh">读 Rate 效应时要注意</span></p>
+            <p><span lang="en">The rate effect is the change in the share of a category's GMV that comes from high-risk sellers. For Men's Shoes, what the data supports is: <b>within Men's Shoes, sellers currently tagged high-risk account for a larger share of GMV.</b></span><span lang="zh">Rate 效应是「品类内高风险卖家成交额占比」的变化。以男鞋为例，数据支持的说法是：<b>在男鞋品类里，当前被标为高风险的卖家贡献了更高比例的成交额。</b></span></p>
+            <ul>
+              <li><span lang="en">It is measured in GMV. The share can grow because these sellers sold more or because the others sold less; it says nothing about how many sellers are high-risk.</span><span lang="zh">它按成交额计算：比重变大，可能是这些卖家卖得更多，也可能是其他卖家卖得更少，推不出高风险卖家的人数变化。</span></li>
+              <li><span lang="en">Risk tiers come from the latest snapshot when the data was pulled, applied to every past week. Both windows use the same tiers, so the change is not "sellers becoming high-risk", and the data cannot show in which week a seller's tier changed.</span><span lang="zh">风险标签取自跑表时的最新快照，回填到所有历史周：基期和观察期用的是同一份标签，所以这个变化不是"卖家变成了高风险"，也还原不了卖家在哪一周变更了等级。</span></li>
+            </ul>
+          </div>
           <p class="caption"><span lang="en">Right of zero pushes the share up, left pulls it down. The rows add up to the overall change exactly; hover a row for its CTV.</span><span lang="zh">零线右边是推高，左边是拉低。各行加起来正好等于整体变化；鼠标停在某一行可以看到它的 CTV。</span></p>
         </div>
         <div class="dash-block">
@@ -230,9 +291,9 @@
 
       <!-- 3. Seller concentration -->
       <div class="dash-panel" id="p-panel-seller" role="tabpanel" aria-labelledby="prci-dashboard-seller">
-        <div class="dash-block">
+        <div class="dash-block" id="p-sel-blk">
           <div class="dash-bar">
-            <h3 class="dash-h"><span lang="en">High-risk GMV by seller rank</span><span lang="zh">高风险成交额按卖家排名分组</span></h3>
+            <h3 class="dash-h"><span lang="en">High-risk GMV by seller rank</span><span lang="zh">高风险成交额按卖家排名分组</span> <span class="scope-tag" id="p-sel-scope"><span lang="en">Scope: all of Fashion</span><span lang="zh">范围：整个 Fashion</span></span></h3>
             <div class="seg" role="group" aria-label="Window" id="p-sel-win">
               <button type="button" data-v="pre" aria-pressed="false"><span lang="en">Before</span><span lang="zh">基期</span></button>
               <button type="button" data-v="post" aria-pressed="true"><span lang="en">After</span><span lang="zh">观察期</span></button>
@@ -240,7 +301,11 @@
           </div>
           <div class="eqs" id="p-sel-eqs"></div>
           <div class="chart" id="p-sel-chart"></div>
-          <p class="caption"><span lang="en">Bars: each rank group's share of high-risk GMV. Line: the cumulative share from the top down. The underlying data keeps every risk tier so the totals are right.</span><span lang="zh">柱子是每个排名组占高风险成交额的比例，折线是从头部往下的累计占比。底层数据保留全部风险等级，保证总额正确。</span></p>
+          <p class="caption"><span lang="en">Bars: each rank group's share of high-risk GMV. Line: the cumulative share from the top down. Sellers are ranked across all of Fashion, not within a category. The underlying data keeps every risk tier so the totals are right.</span><span lang="zh">柱子是每个排名组占高风险成交额的比例，折线是从头部往下的累计占比。卖家按整个 Fashion 排名，不分品类。底层数据保留全部风险等级，保证总额正确。</span></p>
+          <div class="missing" id="p-sel-missing">
+            <p class="tb-k"><span lang="en">What this chart cannot answer</span><span lang="zh">这张图回答不了的问题</span></p>
+            <p><span lang="en">Where is Men's Shoes' high-risk GMV concentrated, and in which sellers? That needs a Men's Shoes × seller-rank breakdown for both windows, then the risk records of the sellers concerned. The illustrative data has no such cross-cut, so no chart is drawn here.</span><span lang="zh">男鞋内部的高风险成交额集中在哪些卖家？要回答它，需要补「男鞋 × 卖家排名」的交叉分布（基期和观察期），再结合相关卖家的具体风险记录。示意数据没有这个交叉维度，所以这里不画图。</span></p>
+          </div>
         </div>
       </div>
 
@@ -248,7 +313,7 @@
       <div class="dash-panel" id="p-panel-seg" role="tabpanel" aria-labelledby="prci-dashboard-seg">
         <div class="dash-block">
           <div class="dash-bar">
-            <h3 class="dash-h"><span lang="en">High-risk share within each segment, before to after</span><span lang="zh">各分群内部的高风险占比：基期 → 观察期</span></h3>
+            <h3 class="dash-h"><span lang="en">High-risk sellers' share of each segment's GMV, before to after</span><span lang="zh">各分群内高风险卖家的成交额占比：基期 → 观察期</span></h3>
             <div class="seg" role="group" aria-label="Segment" id="p-seg-dim">
               <button type="button" data-v="market" aria-pressed="true"><span lang="en">Market</span><span lang="zh">市场</span></button>
               <button type="button" data-v="managed" aria-pressed="false"><span lang="en">Managed</span><span lang="zh">托管</span></button>
@@ -311,5 +376,6 @@
 <script>Kit.initToggles();</script>
 <script src="../site.js"></script>
 <script src="../dash-prci.js"></script>
+<script src="../prci-review.js"></script>
 </body>
 </html>
