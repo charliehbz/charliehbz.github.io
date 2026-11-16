@@ -121,12 +121,12 @@
     card.hidden = false;
     E.focus(S.focus);
   }
-  function go(i) { step = i; render(); card.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
-  function start() {
+  function go(i, quiet) { step = i; render(); if (!quiet) card.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+  function start(quiet) {
     choice = null; drift = false;
     E.showTab('ship');
     E.set(SC, 'tour');
-    go(0);
+    go(0, quiet);
   }
   function exit() { step = -1; card.hidden = true; E.focus([]); }
 
@@ -151,7 +151,11 @@
   Kit.onLang(() => { if (step >= 0) render(); });
   document.querySelectorAll('[data-tour-start]').forEach((a) => a.addEventListener('click', (ev) => { ev.preventDefault(); start(); }));
   // #demo opens the demo: on load, on a hash change, and from the one-file preview's router ('site:target')
-  if (location.hash === '#demo') start();
+  if (location.hash === '#demo') {   // arriving with #demo: the browser jumps to the #demo anchor once the page has
+    start(true);                      // loaded, so the scroll to the card has to wait until after that jump
+    const toCard = () => setTimeout(() => card.scrollIntoView({ block: 'start' }), 80);
+    if (document.readyState === 'complete') toCard(); else window.addEventListener('load', toCard);
+  }
   window.addEventListener('hashchange', () => { if (location.hash === '#demo') start(); });
   window.addEventListener('site:target', (ev) => { if (ev.detail === 'demo') start(); });
 })();
